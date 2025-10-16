@@ -18,6 +18,7 @@ import asyncio
 import sys
 import json
 import mimetypes
+import logging
 from typing import Optional, Dict, List
 from fastapi import FastAPI, Query, Form, Request
 from fastapi.responses import StreamingResponse
@@ -25,24 +26,98 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 import uvicorn
 
+# ============================================================================
+# Startup Logging Configuration
+# ============================================================================
+# Configure detailed logging for debugging startup issues
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='[%(asctime)s] %(levelname)-8s %(name)s: %(message)s'
+)
+logger = logging.getLogger(__name__)
+logger.info("🚀 STARTUP: Initializing TailorBlend Backend API")
+
 # Import existing agent logic
 # Add parent directory to path for both local and Docker
 import os
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+logger.debug(f"📂 Parent directory: {parent_dir}")
 if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
+    logger.debug(f"✅ Added parent directory to sys.path")
 
-from tb_agents.consultant import create_tailorblend_consultant
-from tb_agents.multi_agent_orchestrator import MultiAgentOrchestrator
-from config.settings import load_instructions, load_practitioner_instructions, OPENAI_API_KEY
-from agents import Runner
-from openai.types.responses import ResponseTextDeltaEvent
-from instruction_parser import parse_instructions, reassemble_instructions
-from token_counter import calculate_cost_zar
-from backend.models import MultiAgentBlendRequest, AgentStep
+logger.info("📦 Loading imports...")
+try:
+    logger.debug("→ Importing tb_agents.consultant")
+    from tb_agents.consultant import create_tailorblend_consultant
+    logger.debug("✅ tb_agents.consultant imported")
+except Exception as e:
+    logger.error(f"❌ Failed to import tb_agents.consultant: {e}", exc_info=True)
+    raise
+
+try:
+    logger.debug("→ Importing tb_agents.multi_agent_orchestrator")
+    from tb_agents.multi_agent_orchestrator import MultiAgentOrchestrator
+    logger.debug("✅ tb_agents.multi_agent_orchestrator imported")
+except Exception as e:
+    logger.error(f"❌ Failed to import MultiAgentOrchestrator: {e}", exc_info=True)
+    raise
+
+try:
+    logger.debug("→ Importing config.settings")
+    from config.settings import load_instructions, load_practitioner_instructions, OPENAI_API_KEY
+    logger.debug("✅ config.settings imported")
+    logger.info(f"✓ OPENAI_API_KEY loaded (first 10 chars: {OPENAI_API_KEY[:10]}...)")
+except Exception as e:
+    logger.error(f"❌ Failed to import config.settings: {e}", exc_info=True)
+    raise
+
+try:
+    logger.debug("→ Importing agents.Runner")
+    from agents import Runner
+    logger.debug("✅ agents.Runner imported")
+except Exception as e:
+    logger.error(f"❌ Failed to import agents.Runner: {e}", exc_info=True)
+    raise
+
+try:
+    logger.debug("→ Importing openai.types.responses")
+    from openai.types.responses import ResponseTextDeltaEvent
+    logger.debug("✅ openai.types.responses imported")
+except Exception as e:
+    logger.error(f"❌ Failed to import ResponseTextDeltaEvent: {e}", exc_info=True)
+    raise
+
+try:
+    logger.debug("→ Importing instruction_parser")
+    from instruction_parser import parse_instructions, reassemble_instructions
+    logger.debug("✅ instruction_parser imported")
+except Exception as e:
+    logger.error(f"❌ Failed to import instruction_parser: {e}", exc_info=True)
+    raise
+
+try:
+    logger.debug("→ Importing token_counter")
+    from token_counter import calculate_cost_zar
+    logger.debug("✅ token_counter imported")
+except Exception as e:
+    logger.error(f"❌ Failed to import token_counter: {e}", exc_info=True)
+    raise
+
+try:
+    logger.debug("→ Importing backend.models")
+    from backend.models import MultiAgentBlendRequest, AgentStep
+    logger.debug("✅ backend.models imported")
+except Exception as e:
+    logger.error(f"❌ Failed to import backend.models: {e}", exc_info=True)
+    raise
+
+logger.info("✅ All imports successful")
 
 # CRITICAL: Set OpenAI API key in environment for the Agents SDK
+logger.info("🔑 Setting OPENAI_API_KEY environment variable")
 os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
+logger.info("✅ OPENAI_API_KEY set in environment")
 
 # ============================================================================
 # Data Models
@@ -144,16 +219,19 @@ def build_message_content(message: str, attachments: List[FileAttachment]) -> Li
 # Application Setup
 # ============================================================================
 
+logger.info("🏗️  Creating FastAPI application...")
 app = FastAPI(
     title="TailorBlend AI Consultant API",
     description="Backend API for OpenAI Agents SDK integration",
     version="1.0.0"
 )
+logger.info("✅ FastAPI application created")
 
 # ============================================================================
 # CORS Configuration - Supports local dev and multiple production deployments
 # ============================================================================
 
+logger.info("🔒 Configuring CORS...")
 # Default allowed origins (local development)
 allowed_origins = [
     "http://localhost:8080",
@@ -165,38 +243,58 @@ allowed_origins = [
 # e.g., "https://ui.tailorblend.com,https://app.tailorblend.com"
 cors_env = os.getenv("CORS_ALLOWED_ORIGINS", "")
 if cors_env:
-    allowed_origins.extend([origin.strip() for origin in cors_env.split(",")])
-    print(f"🔧 [CORS] Added {len(cors_env.split(','))} production origin(s)", file=sys.stderr)
+    cors_origins_list = [origin.strip() for origin in cors_env.split(",")]
+    allowed_origins.extend(cors_origins_list)
+    logger.info(f"🔧 [CORS] Added {len(cors_origins_list)} production origin(s): {cors_origins_list}")
+else:
+    logger.debug("ℹ️  No CORS_ALLOWED_ORIGINS environment variable set")
 
-print(f"✅ [CORS] Allowed origins: {allowed_origins}", file=sys.stderr)
+logger.info(f"✅ [CORS] Allowed origins: {allowed_origins}")
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=allowed_origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+try:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=allowed_origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+    logger.info("✅ CORS middleware added")
+except Exception as e:
+    logger.error(f"❌ Failed to add CORS middleware: {e}", exc_info=True)
+    raise
 
 # ============================================================================
 # State Management
 # ============================================================================
 
+logger.info("📊 Initializing state management...")
 # Global conversation state (keyed by session_id)
 # Structure: {session_id: {previous_response_id, message_count, tokens, ...}}
 conversation_state: Dict[str, Dict] = {}
+logger.debug("✅ conversation_state initialized")
 
 # Custom instructions cache (keyed by session_id or "default")
 # NOTE: In-memory only - resets on API restart. This is intentional.
 # To permanently change instructions, edit spec/instructions.txt
 custom_instructions_cache: Dict[str, str] = {}
+logger.debug("✅ custom_instructions_cache initialized")
 
 # Multi-agent session state (keyed by session_id)
 # Separate from conversation_state to keep multi-agent system isolated
 multi_agent_state: Dict[str, Dict] = {}
+logger.debug("✅ multi_agent_state initialized")
 
 # Multi-agent orchestrator instance (singleton)
-multi_agent_orchestrator = MultiAgentOrchestrator()
+logger.info("🤖 Initializing MultiAgentOrchestrator...")
+try:
+    multi_agent_orchestrator = MultiAgentOrchestrator()
+    logger.info("✅ MultiAgentOrchestrator initialized successfully")
+except Exception as e:
+    logger.error(f"❌ Failed to initialize MultiAgentOrchestrator: {e}", exc_info=True)
+    raise
+
+logger.info("✅ State management initialized")
 
 # ============================================================================
 # Endpoints
@@ -754,21 +852,38 @@ def main():
     """
     import os
 
+    logger.info("=" * 80)
+    logger.info("🚀 STARTING TAILORBLEND AI CONSULTANT API SERVER")
+    logger.info("=" * 80)
+
     # Get port from environment
     # Use PYTHON_API_PORT for internal API (default 5000)
     # NOTE: Do NOT use PORT - that's for the public-facing Blazor service
-    port = int(os.getenv("PYTHON_API_PORT", 5000))
+    try:
+        port = int(os.getenv("PYTHON_API_PORT", 5000))
+        logger.info(f"📍 Port configuration: PYTHON_API_PORT={port}")
+    except ValueError as e:
+        logger.error(f"❌ Invalid PYTHON_API_PORT value: {e}")
+        raise
 
-    print(f"\n🚀 Starting TailorBlend AI Consultant API on port {port}\n")
+    logger.info(f"🎯 Ready to start Uvicorn on 0.0.0.0:{port}")
+    logger.info("=" * 80)
+    logger.info("✅ INITIALIZATION COMPLETE - Starting Uvicorn server...")
+    logger.info("=" * 80)
 
-    # Run with uvicorn
-    uvicorn.run(
-        app,
-        host="0.0.0.0",
-        port=port,
-        log_level="info",
-        access_log=True
-    )
+    try:
+        # Run with uvicorn
+        logger.info(f"🚀 Uvicorn startup initiated on port {port}...")
+        uvicorn.run(
+            app,
+            host="0.0.0.0",
+            port=port,
+            log_level="info",
+            access_log=True
+        )
+    except Exception as e:
+        logger.error(f"❌ Failed to start Uvicorn: {e}", exc_info=True)
+        raise
 
 
 if __name__ == "__main__":

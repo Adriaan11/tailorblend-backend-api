@@ -1,0 +1,682 @@
+[
+  {
+    "baseMixId": 1,
+    "baseMixName": "Shake (Whey)",
+    "addMixType": 28,
+    "addMixTypeName": "Protein",
+    "addMixId": 78,
+    "addMixName": "Whey Concentrate (Grass Fed)",
+    "defaultAddMix": 78,
+    "defaultFlag": true
+  },
+  {
+    "baseMixId": 1,
+    "baseMixName": "Shake (Whey)",
+    "addMixType": 28,
+    "addMixTypeName": "Protein",
+    "addMixId": 91,
+    "addMixName": "Whey Isolate",
+    "defaultAddMix": 78,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 1,
+    "baseMixName": "Shake (Whey)",
+    "addMixType": 31,
+    "addMixTypeName": "Thickness",
+    "addMixId": 17,
+    "addMixName": "Regular Thickness",
+    "defaultAddMix": 17,
+    "defaultFlag": true
+  },
+  {
+    "baseMixId": 1,
+    "baseMixName": "Shake (Whey)",
+    "addMixType": 31,
+    "addMixTypeName": "Thickness",
+    "addMixId": 18,
+    "addMixName": "Non-Thickened",
+    "defaultAddMix": 17,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 1,
+    "baseMixName": "Shake (Whey)",
+    "addMixType": 31,
+    "addMixTypeName": "Thickness",
+    "addMixId": 19,
+    "addMixName": "Double Thick",
+    "defaultAddMix": 17,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 1,
+    "baseMixName": "Shake (Whey)",
+    "addMixType": 34,
+    "addMixTypeName": "Flavour (Shake)",
+    "addMixId": 25,
+    "addMixName": "Strawberry Smoothie",
+    "defaultAddMix": 89,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 1,
+    "baseMixName": "Shake (Whey)",
+    "addMixType": 34,
+    "addMixTypeName": "Flavour (Shake)",
+    "addMixId": 26,
+    "addMixName": "Vanilla Ice Cream",
+    "defaultAddMix": 89,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 1,
+    "baseMixName": "Shake (Whey)",
+    "addMixType": 34,
+    "addMixTypeName": "Flavour (Shake)",
+    "addMixId": 27,
+    "addMixName": "Chocolate Milkshake",
+    "defaultAddMix": 89,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 1,
+    "baseMixName": "Shake (Whey)",
+    "addMixType": 34,
+    "addMixTypeName": "Flavour (Shake)",
+    "addMixId": 28,
+    "addMixName": "Unflavoured",
+    "defaultAddMix": 89,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 1,
+    "baseMixName": "Shake (Whey)",
+    "addMixType": 34,
+    "addMixTypeName": "Flavour (Shake)",
+    "addMixId": 85,
+    "addMixName": "Salted Caramel",
+    "defaultAddMix": 89,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 1,
+    "baseMixName": "Shake (Whey)",
+    "addMixType": 34,
+    "addMixTypeName": "Flavour (Shake)",
+    "addMixId": 89,
+    "addMixName": "Decadent Dark Chocolate",
+    "defaultAddMix": 89,
+    "defaultFlag": true
+  },
+  {
+    "baseMixId": 1,
+    "baseMixName": "Shake (Whey)",
+    "addMixType": 34,
+    "addMixTypeName": "Flavour (Shake)",
+    "addMixId": 94,
+    "addMixName": "Cinnamon Stroopwafel",
+    "defaultAddMix": 89,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 1,
+    "baseMixName": "Shake (Whey)",
+    "addMixType": 216,
+    "addMixTypeName": "Sweetener (Shake)",
+    "addMixId": 59,
+    "addMixName": "Stevia",
+    "defaultAddMix": 60,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 1,
+    "baseMixName": "Shake (Whey)",
+    "addMixType": 216,
+    "addMixTypeName": "Sweetener (Shake)",
+    "addMixId": 60,
+    "addMixName": "Sucralose",
+    "defaultAddMix": 60,
+    "defaultFlag": true
+  },
+  {
+    "baseMixId": 1,
+    "baseMixName": "Shake (Whey)",
+    "addMixType": 216,
+    "addMixTypeName": "Sweetener (Shake)",
+    "addMixId": 62,
+    "addMixName": "Sucralose - Extra Sweet",
+    "defaultAddMix": 60,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 1,
+    "baseMixName": "Shake (Whey)",
+    "addMixType": 216,
+    "addMixTypeName": "Sweetener (Shake)",
+    "addMixId": 63,
+    "addMixName": "Unsweetened",
+    "defaultAddMix": 60,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 1,
+    "baseMixName": "Shake (Whey)",
+    "addMixType": 216,
+    "addMixTypeName": "Sweetener (Shake)",
+    "addMixId": 64,
+    "addMixName": "Stevia - Reduced Sweetness",
+    "defaultAddMix": 60,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 1,
+    "baseMixName": "Shake (Whey)",
+    "addMixType": 216,
+    "addMixTypeName": "Sweetener (Shake)",
+    "addMixId": 65,
+    "addMixName": "Sucralose - Reduced Sweetness",
+    "defaultAddMix": 60,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 1,
+    "baseMixName": "Shake (Whey)",
+    "addMixType": 216,
+    "addMixTypeName": "Sweetener (Shake)",
+    "addMixId": 66,
+    "addMixName": "Xylitol",
+    "defaultAddMix": 60,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 1,
+    "baseMixName": "Shake (Whey)",
+    "addMixType": 216,
+    "addMixTypeName": "Sweetener (Shake)",
+    "addMixId": 67,
+    "addMixName": "Xylitol - Reduced Sweetness",
+    "defaultAddMix": 60,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 1,
+    "baseMixName": "Shake (Whey)",
+    "addMixType": 216,
+    "addMixTypeName": "Sweetener (Shake)",
+    "addMixId": 68,
+    "addMixName": "Xylitol - Extra Sweet",
+    "defaultAddMix": 60,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 1,
+    "baseMixName": "Shake (Whey)",
+    "addMixType": 216,
+    "addMixTypeName": "Sweetener (Shake)",
+    "addMixId": 72,
+    "addMixName": "Organic Coconut Sugar",
+    "defaultAddMix": 60,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 1,
+    "baseMixName": "Shake (Whey)",
+    "addMixType": 216,
+    "addMixTypeName": "Sweetener (Shake)",
+    "addMixId": 80,
+    "addMixName": "Erythritol Blend",
+    "defaultAddMix": 60,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 1,
+    "baseMixName": "Shake (Whey)",
+    "addMixType": 216,
+    "addMixTypeName": "Sweetener (Shake)",
+    "addMixId": 82,
+    "addMixName": "Fructose - Reduced Sweetness",
+    "defaultAddMix": 60,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 1,
+    "baseMixName": "Shake (Whey)",
+    "addMixType": 216,
+    "addMixTypeName": "Sweetener (Shake)",
+    "addMixId": 83,
+    "addMixName": "Fructose",
+    "defaultAddMix": 60,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 1,
+    "baseMixName": "Shake (Whey)",
+    "addMixType": 216,
+    "addMixTypeName": "Sweetener (Shake)",
+    "addMixId": 84,
+    "addMixName": "Fructose - Extra Sweet",
+    "defaultAddMix": 60,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 2,
+    "baseMixName": "Drink",
+    "addMixType": 36,
+    "addMixTypeName": "Flavour (Drink)",
+    "addMixId": 35,
+    "addMixName": "Mixed Berry",
+    "defaultAddMix": 38,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 2,
+    "baseMixName": "Drink",
+    "addMixType": 36,
+    "addMixTypeName": "Flavour (Drink)",
+    "addMixId": 36,
+    "addMixName": "Tangerine",
+    "defaultAddMix": 38,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 2,
+    "baseMixName": "Drink",
+    "addMixType": 36,
+    "addMixTypeName": "Flavour (Drink)",
+    "addMixId": 37,
+    "addMixName": "Crushed Orange",
+    "defaultAddMix": 38,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 2,
+    "baseMixName": "Drink",
+    "addMixType": 36,
+    "addMixTypeName": "Flavour (Drink)",
+    "addMixId": 38,
+    "addMixName": "Passion Fruit",
+    "defaultAddMix": 38,
+    "defaultFlag": true
+  },
+  {
+    "baseMixId": 2,
+    "baseMixName": "Drink",
+    "addMixType": 36,
+    "addMixTypeName": "Flavour (Drink)",
+    "addMixId": 39,
+    "addMixName": "Grape Soda-Pop",
+    "defaultAddMix": 38,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 2,
+    "baseMixName": "Drink",
+    "addMixType": 36,
+    "addMixTypeName": "Flavour (Drink)",
+    "addMixId": 43,
+    "addMixName": "Unflavoured",
+    "defaultAddMix": 38,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 2,
+    "baseMixName": "Drink",
+    "addMixType": 36,
+    "addMixTypeName": "Flavour (Drink)",
+    "addMixId": 77,
+    "addMixName": "Islander\u0027s Pineapple",
+    "defaultAddMix": 38,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 2,
+    "baseMixName": "Drink",
+    "addMixType": 36,
+    "addMixTypeName": "Flavour (Drink)",
+    "addMixId": 90,
+    "addMixName": "Sour Apple",
+    "defaultAddMix": 38,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 2,
+    "baseMixName": "Drink",
+    "addMixType": 215,
+    "addMixTypeName": "Sweetener (Drink)",
+    "addMixId": 56,
+    "addMixName": "Stevia",
+    "defaultAddMix": 57,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 2,
+    "baseMixName": "Drink",
+    "addMixType": 215,
+    "addMixTypeName": "Sweetener (Drink)",
+    "addMixId": 57,
+    "addMixName": "Sucralose",
+    "defaultAddMix": 57,
+    "defaultFlag": true
+  },
+  {
+    "baseMixId": 2,
+    "baseMixName": "Drink",
+    "addMixType": 215,
+    "addMixTypeName": "Sweetener (Drink)",
+    "addMixId": 58,
+    "addMixName": "Xylitol",
+    "defaultAddMix": 57,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 2,
+    "baseMixName": "Drink",
+    "addMixType": 215,
+    "addMixTypeName": "Sweetener (Drink)",
+    "addMixId": 79,
+    "addMixName": "Erythritol Blend",
+    "defaultAddMix": 57,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 2,
+    "baseMixName": "Drink",
+    "addMixType": 215,
+    "addMixTypeName": "Sweetener (Drink)",
+    "addMixId": 81,
+    "addMixName": "Fructose",
+    "defaultAddMix": 57,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 6,
+    "baseMixName": "Nutriblend - F",
+    "addMixType": 214,
+    "addMixTypeName": "Flavour ( Nutriblend-F )",
+    "addMixId": 51,
+    "addMixName": "Strawberry",
+    "defaultAddMix": 51,
+    "defaultFlag": true
+  },
+  {
+    "baseMixId": 6,
+    "baseMixName": "Nutriblend - F",
+    "addMixType": 214,
+    "addMixTypeName": "Flavour ( Nutriblend-F )",
+    "addMixId": 52,
+    "addMixName": "Vanilla",
+    "defaultAddMix": 51,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 6,
+    "baseMixName": "Nutriblend - F",
+    "addMixType": 214,
+    "addMixTypeName": "Flavour ( Nutriblend-F )",
+    "addMixId": 55,
+    "addMixName": "Chocolate",
+    "defaultAddMix": 51,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 8,
+    "baseMixName": "Shake (Vegan)",
+    "addMixType": 216,
+    "addMixTypeName": "Sweetener (Shake)",
+    "addMixId": 59,
+    "addMixName": "Stevia",
+    "defaultAddMix": 60,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 8,
+    "baseMixName": "Shake (Vegan)",
+    "addMixType": 216,
+    "addMixTypeName": "Sweetener (Shake)",
+    "addMixId": 60,
+    "addMixName": "Sucralose",
+    "defaultAddMix": 60,
+    "defaultFlag": true
+  },
+  {
+    "baseMixId": 8,
+    "baseMixName": "Shake (Vegan)",
+    "addMixType": 216,
+    "addMixTypeName": "Sweetener (Shake)",
+    "addMixId": 62,
+    "addMixName": "Sucralose - Extra Sweet",
+    "defaultAddMix": 60,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 8,
+    "baseMixName": "Shake (Vegan)",
+    "addMixType": 216,
+    "addMixTypeName": "Sweetener (Shake)",
+    "addMixId": 63,
+    "addMixName": "Unsweetened",
+    "defaultAddMix": 60,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 8,
+    "baseMixName": "Shake (Vegan)",
+    "addMixType": 216,
+    "addMixTypeName": "Sweetener (Shake)",
+    "addMixId": 64,
+    "addMixName": "Stevia - Reduced Sweetness",
+    "defaultAddMix": 60,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 8,
+    "baseMixName": "Shake (Vegan)",
+    "addMixType": 216,
+    "addMixTypeName": "Sweetener (Shake)",
+    "addMixId": 65,
+    "addMixName": "Sucralose - Reduced Sweetness",
+    "defaultAddMix": 60,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 8,
+    "baseMixName": "Shake (Vegan)",
+    "addMixType": 216,
+    "addMixTypeName": "Sweetener (Shake)",
+    "addMixId": 66,
+    "addMixName": "Xylitol",
+    "defaultAddMix": 60,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 8,
+    "baseMixName": "Shake (Vegan)",
+    "addMixType": 216,
+    "addMixTypeName": "Sweetener (Shake)",
+    "addMixId": 67,
+    "addMixName": "Xylitol - Reduced Sweetness",
+    "defaultAddMix": 60,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 8,
+    "baseMixName": "Shake (Vegan)",
+    "addMixType": 216,
+    "addMixTypeName": "Sweetener (Shake)",
+    "addMixId": 68,
+    "addMixName": "Xylitol - Extra Sweet",
+    "defaultAddMix": 60,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 8,
+    "baseMixName": "Shake (Vegan)",
+    "addMixType": 216,
+    "addMixTypeName": "Sweetener (Shake)",
+    "addMixId": 72,
+    "addMixName": "Organic Coconut Sugar",
+    "defaultAddMix": 60,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 8,
+    "baseMixName": "Shake (Vegan)",
+    "addMixType": 216,
+    "addMixTypeName": "Sweetener (Shake)",
+    "addMixId": 80,
+    "addMixName": "Erythritol Blend",
+    "defaultAddMix": 60,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 8,
+    "baseMixName": "Shake (Vegan)",
+    "addMixType": 216,
+    "addMixTypeName": "Sweetener (Shake)",
+    "addMixId": 82,
+    "addMixName": "Fructose - Reduced Sweetness",
+    "defaultAddMix": 60,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 8,
+    "baseMixName": "Shake (Vegan)",
+    "addMixType": 216,
+    "addMixTypeName": "Sweetener (Shake)",
+    "addMixId": 83,
+    "addMixName": "Fructose",
+    "defaultAddMix": 60,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 8,
+    "baseMixName": "Shake (Vegan)",
+    "addMixType": 216,
+    "addMixTypeName": "Sweetener (Shake)",
+    "addMixId": 84,
+    "addMixName": "Fructose - Extra Sweet",
+    "defaultAddMix": 60,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 8,
+    "baseMixName": "Shake (Vegan)",
+    "addMixType": 31,
+    "addMixTypeName": "Thickness",
+    "addMixId": 17,
+    "addMixName": "Regular Thickness",
+    "defaultAddMix": 17,
+    "defaultFlag": true
+  },
+  {
+    "baseMixId": 8,
+    "baseMixName": "Shake (Vegan)",
+    "addMixType": 31,
+    "addMixTypeName": "Thickness",
+    "addMixId": 18,
+    "addMixName": "Non-Thickened",
+    "defaultAddMix": 17,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 8,
+    "baseMixName": "Shake (Vegan)",
+    "addMixType": 31,
+    "addMixTypeName": "Thickness",
+    "addMixId": 19,
+    "addMixName": "Double Thick",
+    "defaultAddMix": 17,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 8,
+    "baseMixName": "Shake (Vegan)",
+    "addMixType": 34,
+    "addMixTypeName": "Flavour (Shake)",
+    "addMixId": 25,
+    "addMixName": "Strawberry Smoothie",
+    "defaultAddMix": 27,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 8,
+    "baseMixName": "Shake (Vegan)",
+    "addMixType": 34,
+    "addMixTypeName": "Flavour (Shake)",
+    "addMixId": 26,
+    "addMixName": "Vanilla Ice Cream",
+    "defaultAddMix": 27,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 8,
+    "baseMixName": "Shake (Vegan)",
+    "addMixType": 34,
+    "addMixTypeName": "Flavour (Shake)",
+    "addMixId": 27,
+    "addMixName": "Chocolate MilkShake",
+    "defaultAddMix": 27,
+    "defaultFlag": true
+  },
+  {
+    "baseMixId": 8,
+    "baseMixName": "Shake (Vegan)",
+    "addMixType": 34,
+    "addMixTypeName": "Flavour (Shake)",
+    "addMixId": 28,
+    "addMixName": "Unflavoured",
+    "defaultAddMix": 27,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 8,
+    "baseMixName": "Shake (Vegan)",
+    "addMixType": 34,
+    "addMixTypeName": "Flavour (Shake)",
+    "addMixId": 85,
+    "addMixName": "Salted Caramel",
+    "defaultAddMix": 27,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 8,
+    "baseMixName": "Shake (Vegan)",
+    "addMixType": 34,
+    "addMixTypeName": "Flavour (Shake)",
+    "addMixId": 89,
+    "addMixName": "Decadent Dark Chocolate",
+    "defaultAddMix": 27,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 8,
+    "baseMixName": "Shake (Vegan)",
+    "addMixType": 34,
+    "addMixTypeName": "Flavour (Shake)",
+    "addMixId": 94,
+    "addMixName": "Cinnamon Stroopwafel",
+    "defaultAddMix": 27,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 8,
+    "baseMixName": "Shake (Vegan)",
+    "addMixType": 219,
+    "addMixTypeName": "Protein (vegan)",
+    "addMixId": 71,
+    "addMixName": "Rice Protein",
+    "defaultAddMix": 87,
+    "defaultFlag": false
+  },
+  {
+    "baseMixId": 8,
+    "baseMixName": "Shake (Vegan)",
+    "addMixType": 219,
+    "addMixTypeName": "Protein (vegan)",
+    "addMixId": 87,
+    "addMixName": "Hemp Protein Blend",
+    "defaultAddMix": 87,
+    "defaultFlag": true
+  }
+]

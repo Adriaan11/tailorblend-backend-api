@@ -1,0 +1,29 @@
+# TailorBlend AI Consultant - Backend API Dependencies
+
+# FastAPI Web Framework
+# Provides async REST API with automatic OpenAPI docs
+fastapi>=0.115.0
+
+# ASGI Server
+# Production-ready server for running FastAPI
+uvicorn[standard]>=0.30.0
+
+# OpenAI Agents SDK
+# Provides Agent, Runner, and tool integration
+openai-agents>=0.1.0
+
+# Environment variable management
+# Used to load OPENAI_API_KEY from .env file
+python-dotenv>=1.0.0
+
+# Token counting
+# OpenAI's official tokenizer for accurate token counting
+tiktoken>=0.5.0
+
+# HTTP requests
+# Used for any external API calls (not OAuth - that's in Blazor)
+requests>=2.31.0
+
+# Pydantic
+# Data validation and serialization (included with FastAPI but explicit here)
+pydantic>=2.0.0

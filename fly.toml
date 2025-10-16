@@ -1,0 +1,43 @@
+# fly.toml - TailorBlend AI Consultant Backend API
+# Deployment configuration for fly.io
+
+app = "tailorblend-api"
+primary_region = "jnb"  # Johannesburg, South Africa
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  ASPNETCORE_ENVIRONMENT = "Production"
+  PYTHON_API_PORT = "8080"  # fly.io uses 8080 as standard port
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "off"
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [http_service.concurrency]
+    type = "connections"
+    hard_limit = 250
+    soft_limit = 200
+
+  # Health check
+  [[http_service.checks]]
+    grace_period = "60s"
+    interval = "30s"
+    method = "GET"
+    timeout = "5s"
+    path = "/api/health"
+
+# VM configuration
+[vm]
+  size = "shared-cpu-1x"
+  memory = "512mb"
+
+# Environment variables for production
+[env.CORS_ALLOWED_ORIGINS]
+  description = "Comma-separated list of allowed frontend URLs"
+  # Example: "https://ui.tailorblend.com,https://app.tailorblend.com"
+  # This must be set for production - use 'fly secrets set' or 'fly deploy --env'

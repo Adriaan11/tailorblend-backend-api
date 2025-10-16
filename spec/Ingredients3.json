@@ -1,0 +1,1121 @@
+[
+  {
+    "ingredientId": 2,
+    "name": "ALPHA LIPOIC ACID",
+    "minimumRange": "10.00",
+    "reccomendedRange": "35.00",
+    "customerMaxRange": "140.00",
+    "pricePer30Servings": "30.80",
+    "overview": "",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 3,
+    "name": "DIGEZYME\u00AE",
+    "minimumRange": "5.00",
+    "reccomendedRange": "150.00",
+    "customerMaxRange": "300.00",
+    "pricePer30Servings": "66.30",
+    "overview": "alpha-amylase, Protease, Lipase, Cellulase, and Lactase.",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 4,
+    "name": "BCAA  BLEND",
+    "minimumRange": "0.50",
+    "reccomendedRange": "4.00",
+    "customerMaxRange": "8.00",
+    "pricePer30Servings": "92.98",
+    "overview": "ONLY AVAILABLE IN DRINKS    Isoleucine     25%             Leucine     50%             Valine     25%",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 5,
+    "name": "BETA ALANINE",
+    "minimumRange": "0.10",
+    "reccomendedRange": "1.00",
+    "customerMaxRange": "4.00",
+    "pricePer30Servings": "27.94",
+    "overview": "",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 6,
+    "name": "PIPERINE",
+    "minimumRange": "5.00",
+    "reccomendedRange": "10.00",
+    "customerMaxRange": "20.00",
+    "pricePer30Servings": "29.78",
+    "overview": "",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 7,
+    "name": "CAFFEINE",
+    "minimumRange": "5.00",
+    "reccomendedRange": "75.00",
+    "customerMaxRange": "300.00",
+    "pricePer30Servings": "16.81",
+    "overview": "contains caffeine ",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 9,
+    "name": "CHROMIUM A.A.C.",
+    "minimumRange": "10.00",
+    "reccomendedRange": "25.00",
+    "customerMaxRange": "50.00",
+    "pricePer30Servings": "9.10",
+    "overview": "Chelated to glycine",
+    "unitOfMeasureName": "\u0026micro;g"
+  },
+  {
+    "ingredientId": 11,
+    "name": "CO-ENZYME Q10",
+    "minimumRange": "15.00",
+    "reccomendedRange": "90.00",
+    "customerMaxRange": "200.00",
+    "pricePer30Servings": "102.35",
+    "overview": " ",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 12,
+    "name": "COLOSTRUM",
+    "minimumRange": "0.10",
+    "reccomendedRange": "1.00",
+    "customerMaxRange": "10.00",
+    "pricePer30Servings": "193.95",
+    "overview": "bovine, contains dairy",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 13,
+    "name": "COPPER A.A.C.",
+    "minimumRange": "220.00",
+    "reccomendedRange": "270.00",
+    "customerMaxRange": "4000.00",
+    "pricePer30Servings": "10.72",
+    "overview": "amino acid chelate.",
+    "unitOfMeasureName": "\u0026micro;g"
+  },
+  {
+    "ingredientId": 14,
+    "name": "CREATINE MONOHYDRATE",
+    "minimumRange": "0.50",
+    "reccomendedRange": "5.00",
+    "customerMaxRange": "20.00",
+    "pricePer30Servings": "141.45",
+    "overview": "nitrogenous organic acid",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 15,
+    "name": "CURCUMIN C3 COMPLEX\u00AE",
+    "minimumRange": "25.00",
+    "reccomendedRange": "250.00",
+    "customerMaxRange": "500.00",
+    "pricePer30Servings": "132.45",
+    "overview": " 95% curcuminoids    SOD (Superoxide dismutase ",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 20,
+    "name": "GABA",
+    "minimumRange": "0.25",
+    "reccomendedRange": "0.50",
+    "customerMaxRange": "2.00",
+    "pricePer30Servings": "32.18",
+    "overview": "Gamma- Amino butyric acid",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 21,
+    "name": "GLUCOSAMINE SULFATE",
+    "minimumRange": "0.50",
+    "reccomendedRange": "1.00",
+    "customerMaxRange": "1.50",
+    "pricePer30Servings": "68.42",
+    "overview": "glucosamine sulphate",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 22,
+    "name": "GREEN COFFEE BEAN EXTRACT",
+    "minimumRange": "100.00",
+    "reccomendedRange": "300.00",
+    "customerMaxRange": "800.00",
+    "pricePer30Servings": "67.58",
+    "overview": "contains caffeine",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 23,
+    "name": "GREEN TEA EXTRACT",
+    "minimumRange": "50.00",
+    "reccomendedRange": "125.00",
+    "customerMaxRange": "200.00",
+    "pricePer30Servings": "29.11",
+    "overview": " contains caffeine",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 27,
+    "name": "IRON A.A.C.",
+    "minimumRange": "5.00",
+    "reccomendedRange": "10.00",
+    "customerMaxRange": "24.00",
+    "pricePer30Servings": "23.39",
+    "overview": "amino acid chelate",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 29,
+    "name": "L-ARGININE",
+    "minimumRange": "0.10",
+    "reccomendedRange": "2.00",
+    "customerMaxRange": "3.00",
+    "pricePer30Servings": "89.52",
+    "overview": "ONLY AVAILABLE IN DRINKS",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 31,
+    "name": "L-CITRULLINE MALATE",
+    "minimumRange": "0.20",
+    "reccomendedRange": "2.00",
+    "customerMaxRange": "8.00",
+    "pricePer30Servings": "101.68",
+    "overview": " ",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 32,
+    "name": "L-GLUTAMINE",
+    "minimumRange": "0.10",
+    "reccomendedRange": "2.00",
+    "customerMaxRange": "8.00",
+    "pricePer30Servings": "72.58",
+    "overview": "",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 33,
+    "name": "L-ISOLEUCINE",
+    "minimumRange": "0.10",
+    "reccomendedRange": "2.00",
+    "customerMaxRange": "4.00",
+    "pricePer30Servings": "122.25",
+    "overview": "ONLY AVAILABLE IN DRINKS",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 34,
+    "name": "L-LEUCINE",
+    "minimumRange": "0.10",
+    "reccomendedRange": "2.00",
+    "customerMaxRange": "8.00",
+    "pricePer30Servings": "87.50",
+    "overview": "ONLY AVAILABLE IN DRINKS",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 35,
+    "name": "L-TYROSINE",
+    "minimumRange": "0.10",
+    "reccomendedRange": "0.50",
+    "customerMaxRange": "1.50",
+    "pricePer30Servings": "43.62",
+    "overview": "BETTER SUITED TO SHAKES",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 36,
+    "name": "FIBREGUM B\u00AE",
+    "minimumRange": "0.50",
+    "reccomendedRange": "1.00",
+    "customerMaxRange": "8.00",
+    "pricePer30Servings": "45.36",
+    "overview": "prebiotic fibre based on 100% acacia trees",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 37,
+    "name": "L-VALINE",
+    "minimumRange": "0.25",
+    "reccomendedRange": "2.00",
+    "customerMaxRange": "4.00",
+    "pricePer30Servings": "77.69",
+    "overview": "ONLY AVAILABLE IN DRINKS",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 38,
+    "name": "MAGNESIUM CITRATE (8.5% ELEMENT)",
+    "minimumRange": "100.00",
+    "reccomendedRange": "2941.00",
+    "customerMaxRange": "2941.00",
+    "pricePer30Servings": "62.16",
+    "overview": "Magnesium in its salt form, with citric acid",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 40,
+    "name": "MANGANESE A.A.C.",
+    "minimumRange": "500.00",
+    "reccomendedRange": "1000.00",
+    "customerMaxRange": "4000.00",
+    "pricePer30Servings": "11.60",
+    "overview": "amino acid chelate ",
+    "unitOfMeasureName": "\u0026micro;g"
+  },
+  {
+    "ingredientId": 41,
+    "name": "MCT (OIL)",
+    "minimumRange": "0.10",
+    "reccomendedRange": "1.00",
+    "customerMaxRange": "1.50",
+    "pricePer30Servings": "42.81",
+    "overview": "BETTER SUITED TO SHAKES",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 42,
+    "name": "MCT (POWDER)",
+    "minimumRange": "1.00",
+    "reccomendedRange": "5.00",
+    "customerMaxRange": "15.00",
+    "pricePer30Servings": "301.26",
+    "overview": "mixed with glucose syrup to create powder",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 43,
+    "name": "VITAMIN B9 (METHYLFOLATE)",
+    "minimumRange": "100.00",
+    "reccomendedRange": "400.00",
+    "customerMaxRange": "500.00",
+    "pricePer30Servings": "50.98",
+    "overview": "",
+    "unitOfMeasureName": "\u0026micro;g"
+  },
+  {
+    "ingredientId": 44,
+    "name": "MOLYBDENUM A.A.C.",
+    "minimumRange": "13.00",
+    "reccomendedRange": "50.00",
+    "customerMaxRange": "230.00",
+    "pricePer30Servings": "9.52",
+    "overview": "amino acid chelate"
+  },
+  {
+    "ingredientId": 45,
+    "name": "MSM",
+    "minimumRange": "250.00",
+    "reccomendedRange": "750.00",
+    "customerMaxRange": "2000.00",
+    "pricePer30Servings": "38.63",
+    "overview": "Methylsulfonylmethane",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 46,
+    "name": "N-ACETYL-L-CARNITINE",
+    "minimumRange": "0.10",
+    "reccomendedRange": "1.00",
+    "customerMaxRange": "1.50",
+    "pricePer30Servings": "144.71",
+    "overview": "",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 47,
+    "name": "NAC (N-ACETYL-L-CYSTEINE)",
+    "minimumRange": "10.00",
+    "reccomendedRange": "200.00",
+    "customerMaxRange": "600.00",
+    "pricePer30Servings": "43.45",
+    "overview": "",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 49,
+    "name": "PALATINOSE\u00AE",
+    "minimumRange": "1.00",
+    "reccomendedRange": "10.00",
+    "customerMaxRange": "40.00",
+    "pricePer30Servings": "81.89",
+    "overview": "Isomaltulose",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 50,
+    "name": "GINSENG (PANAX)",
+    "minimumRange": "10.00",
+    "reccomendedRange": "200.00",
+    "customerMaxRange": "400.00",
+    "pricePer30Servings": "87.69",
+    "overview": "",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 52,
+    "name": "COLLAGEN PEPTIDES",
+    "minimumRange": "1.00",
+    "reccomendedRange": "5.00",
+    "customerMaxRange": "20.00",
+    "pricePer30Servings": "203.28",
+    "overview": "Bovine Collagen has the following amino acid profile:                Alanine     8,10%             Arginine     8,40%             Aspartic Acid     6,60%             Glutamic Acid     12,40%             Glycine     20,60%             Histidine     0,80%             Isoleucine     1,50%             Leucine     2,90%             Lysine     3,40%             Methionine     0,60%             Phenylalanine     2,10%             Proline     22,90%             Serine     3,40%             Threonine     1,90%             Tyrosine     0,50%             Valine     2,40%",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 54,
+    "name": "PHOSPHATIDYLSERINE",
+    "minimumRange": "20.00",
+    "reccomendedRange": "250.00",
+    "customerMaxRange": "1000.00",
+    "pricePer30Servings": "284.37",
+    "overview": "",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 56,
+    "name": "POTASSIUM BICARBONATE",
+    "minimumRange": "0.01",
+    "reccomendedRange": "1.00",
+    "customerMaxRange": "2.50",
+    "pricePer30Servings": "34.24",
+    "overview": "can cause fizzing in drinks",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 57,
+    "name": "IODINE (POTASSIUM IODIDE)",
+    "minimumRange": "10.00",
+    "reccomendedRange": "100.00",
+    "customerMaxRange": "500.00",
+    "pricePer30Servings": "16.33",
+    "overview": "",
+    "unitOfMeasureName": "\u0026micro;g"
+  },
+  {
+    "ingredientId": 58,
+    "name": "PROBIOTIC",
+    "minimumRange": "0.20",
+    "reccomendedRange": "2.00",
+    "customerMaxRange": "3.00",
+    "pricePer30Servings": "78.79",
+    "overview": "100% Bacillus Coagulans",
+    "unitOfMeasureName": "cfu"
+  },
+  {
+    "ingredientId": 59,
+    "name": "PSYLLIUM HUSK",
+    "minimumRange": "1.00",
+    "reccomendedRange": "2.00",
+    "customerMaxRange": "3.00",
+    "pricePer30Servings": "124.45",
+    "overview": "Thickens drinks and shakes",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 61,
+    "name": "RASPBERRY KETONES",
+    "minimumRange": "40.00",
+    "reccomendedRange": "68.00",
+    "customerMaxRange": "68.00",
+    "pricePer30Servings": "28.27",
+    "overview": "",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 63,
+    "name": "SELENIUM A.A.C.",
+    "minimumRange": "20.00",
+    "reccomendedRange": "25.00",
+    "customerMaxRange": "200.00",
+    "pricePer30Servings": "10.70",
+    "overview": "Selenium amino acid chelate",
+    "unitOfMeasureName": "\u0026micro;g"
+  },
+  {
+    "ingredientId": 64,
+    "name": "SODIUM BICARBONATE",
+    "minimumRange": "0.20",
+    "reccomendedRange": "2.00",
+    "customerMaxRange": "5.00",
+    "pricePer30Servings": "57.31",
+    "overview": "",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 65,
+    "name": "SPIRULINA",
+    "minimumRange": "0.50",
+    "reccomendedRange": "1.00",
+    "customerMaxRange": "2.00",
+    "pricePer30Servings": "62.69",
+    "overview": "non-toxic cyanobacterium",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 66,
+    "name": "TOLERASE ",
+    "minimumRange": "10.00",
+    "reccomendedRange": "25.00",
+    "customerMaxRange": "25.00",
+    "pricePer30Servings": "52.24",
+    "overview": "Tolerase is a acid lactase enzyme, that converts lactose (a milk sugar) into glucose and galactose.    The enzyme in tolerase originates from a strain of the fungus, Aspergillus oryzae",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 67,
+    "name": "TAURINE",
+    "minimumRange": "100.00",
+    "reccomendedRange": "500.00",
+    "customerMaxRange": "2000.00",
+    "pricePer30Servings": "30.04",
+    "overview": "",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 68,
+    "name": "VITAMIN A ",
+    "minimumRange": "333.00",
+    "reccomendedRange": "1498.50",
+    "customerMaxRange": "2997.00",
+    "pricePer30Servings": "12.41",
+    "overview": "Vitamin A acetate",
+    "unitOfMeasureName": "IU"
+  },
+  {
+    "ingredientId": 69,
+    "name": "VITAMIN B1 (THIAMINE)",
+    "minimumRange": "1.00",
+    "reccomendedRange": "50.00",
+    "customerMaxRange": "100.00",
+    "pricePer30Servings": "27.21",
+    "overview": "",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 70,
+    "name": "VITAMIN B12",
+    "minimumRange": "1.00",
+    "reccomendedRange": "100.00",
+    "customerMaxRange": "100.00",
+    "pricePer30Servings": "22.60",
+    "overview": "cyanocobalamin",
+    "unitOfMeasureName": "\u0026micro;g"
+  },
+  {
+    "ingredientId": 71,
+    "name": "VITAMIN B2 (RIBOFLAVIN)",
+    "minimumRange": "0.05",
+    "reccomendedRange": "50.00",
+    "customerMaxRange": "100.00",
+    "pricePer30Servings": "30.42",
+    "overview": "",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 72,
+    "name": "VITAMIN B3 (NICOTINAMIDE)",
+    "minimumRange": "4.00",
+    "reccomendedRange": "16.00",
+    "customerMaxRange": "500.00",
+    "pricePer30Servings": "10.92",
+    "overview": "",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 73,
+    "name": "VITAMIN B6 (P5P) ",
+    "minimumRange": "1.00",
+    "reccomendedRange": "15.00",
+    "customerMaxRange": "100.00",
+    "pricePer30Servings": "34.22",
+    "overview": " Pyridoxal 5?-phosphate",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 74,
+    "name": "VITAMIN C",
+    "minimumRange": "10.00",
+    "reccomendedRange": "1000.00",
+    "customerMaxRange": "1000.00",
+    "pricePer30Servings": "32.31",
+    "overview": "ascorbic acid. Better suited for drinks",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 75,
+    "name": "VITAMIN D3 (CHOLECALCIFEROL)",
+    "minimumRange": "200.00",
+    "reccomendedRange": "1000.00",
+    "customerMaxRange": "5000.00",
+    "pricePer30Servings": "17.88",
+    "overview": "",
+    "unitOfMeasureName": "IU"
+  },
+  {
+    "ingredientId": 76,
+    "name": "VITAMIN E",
+    "minimumRange": "1.00",
+    "reccomendedRange": "150.00",
+    "customerMaxRange": "400.00",
+    "pricePer30Servings": "47.91",
+    "overview": "Vitamin E acetate",
+    "unitOfMeasureName": "IU"
+  },
+  {
+    "ingredientId": 77,
+    "name": "VITAMIN K2 (MenaQ7)",
+    "minimumRange": "30.00",
+    "reccomendedRange": "60.00",
+    "customerMaxRange": "120.00",
+    "pricePer30Servings": "61.07",
+    "overview": "Vitamin K2, also known as Menaquinone",
+    "unitOfMeasureName": "\u0026micro;g"
+  },
+  {
+    "ingredientId": 81,
+    "name": "ZINC A.A.C.",
+    "minimumRange": "5.00",
+    "reccomendedRange": "25.00",
+    "customerMaxRange": "25.00",
+    "pricePer30Servings": "43.05",
+    "overview": "amino acid chelate that Zinc",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 91,
+    "name": "WHEY PROTEIN ISOLATE",
+    "minimumRange": "5.00",
+    "reccomendedRange": "5.00",
+    "customerMaxRange": "25.00",
+    "pricePer30Servings": "158.38",
+    "overview": "ONLY AVAILABLE IN SHAKES, contains dairy, Whey Protein Isolate contains the following amino acid profile:                 Alanine     4,76%             Arginine     2,11%             Aspartic Acid     9,86%             Cysteine     2,02%             Glutamic Acid     4,52%             Glycine     12,56%             Histidine     1,34%             Isoleucine     1,91%             Leucine     5,54%             Lysine     10,80%             Methionine     7,84%             Phenylalanine     2,01%             Proline     3,05%             Serine     5,98%             Threonine     4,90%             Tryptophan     0,75%             Tyrosine     3,13%             Valine     4,89%",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 94,
+    "name": "CLA (60%)",
+    "minimumRange": "250.00",
+    "reccomendedRange": "1200.00",
+    "customerMaxRange": "6400.00",
+    "pricePer30Servings": "124.67",
+    "overview": "Conjugated linoleic acids",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 95,
+    "name": "L-ARGININE AKG",
+    "minimumRange": "0.10",
+    "reccomendedRange": "3.00",
+    "customerMaxRange": "6.00",
+    "pricePer30Servings": "133.12",
+    "overview": "BETTER SUITED TO DRINKS",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 96,
+    "name": "FIBERSOL-2\u00AE (ADDITIONAL)",
+    "minimumRange": "2.00",
+    "reccomendedRange": "6.00",
+    "customerMaxRange": "12.00",
+    "pricePer30Servings": "136.95",
+    "overview": " a digestion-resistant, maltodextrin, soluble corn fibre",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 103,
+    "name": "WHEY HYDROLYSATE",
+    "minimumRange": "1.00",
+    "reccomendedRange": "5.00",
+    "customerMaxRange": "20.00",
+    "pricePer30Servings": "177.25",
+    "overview": "ONLY AVAILABLE IN SHAKES                  Whey Protein Hydrolysate contains the following amino acid profile:                      Alanine     3,60%             Arginine     2,50%             Aspartic Acid     8,60%             Cysteine     1,70%             Glutamic Acid     13,60%             Glycine     1,50%             Histidine     1,50%             Isoleucine     4,80%             Leucine     9,00%             Lysine     7,20%             Methionine     1,70%             Phenylalanine     2,60%             Proline     5,70%             Serine     4,80%             Threonine     5,00%             Tryptophan     1,30%             Tyrosine     2,30%             Valine     4,50%",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 104,
+    "name": "DIM (BROCCOLI EXTRACT)",
+    "minimumRange": "20.00",
+    "reccomendedRange": "250.00",
+    "customerMaxRange": "500.00",
+    "pricePer30Servings": "169.94",
+    "overview": "DIM (3,3\u0027-Diindolylmethane)",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 107,
+    "name": "L-THEANINE",
+    "minimumRange": "20.00",
+    "reccomendedRange": "100.00",
+    "customerMaxRange": "500.00",
+    "pricePer30Servings": "29.26",
+    "overview": "",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 108,
+    "name": "RESVERATROL",
+    "minimumRange": "50.00",
+    "reccomendedRange": "250.00",
+    "customerMaxRange": "600.00",
+    "pricePer30Servings": "275.21",
+    "overview": "becomes bitter if blend isn�t drunk immediately",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 111,
+    "name": "D-RIBOSE",
+    "minimumRange": "0.05",
+    "reccomendedRange": "5.00",
+    "customerMaxRange": "15.00",
+    "pricePer30Servings": "196.29",
+    "overview": "",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 112,
+    "name": "FULVIC ACID",
+    "minimumRange": "100.00",
+    "reccomendedRange": "800.00",
+    "customerMaxRange": "1200.00",
+    "pricePer30Servings": "266.46",
+    "overview": "",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 113,
+    "name": "* VITAMIN-B COMPLEX",
+    "minimumRange": "10.00",
+    "reccomendedRange": "546.50",
+    "customerMaxRange": "546.50",
+    "pricePer30Servings": "100.49",
+    "overview": "TAILORBLEND\u0027s vitamin B blend contains all eight B vitamins:       Vitamin B1 (Thiamine) - 100mg   Vitamin B2 (Riboflavin) - 75mg   Vitamin B3 (Nicotinamide) - 100mg   Vitamin B5 (Ca-D-Pantothenate) - 60mg   Vitamin B6 (Pyridoxine) - 100mg   Vitamin B7 (Biotin) - 500mcg   Methyl Folate - 400mcg (220mcg Vitamin B9)   Vitamin B12 (Methylcobalamin) - 100mcg      The above quantities are relevant at the recommended dose.",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 129,
+    "name": "VITAMIN B5 (CA-D-PANTOTHENATE)",
+    "minimumRange": "1.00",
+    "reccomendedRange": "200.00",
+    "customerMaxRange": "200.00",
+    "pricePer30Servings": "39.50",
+    "overview": "",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 132,
+    "name": "VITAMIN B3 (NIACIN)",
+    "minimumRange": "4.00",
+    "reccomendedRange": "16.00",
+    "customerMaxRange": "35.00",
+    "pricePer30Servings": "10.52",
+    "overview": "",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 133,
+    "name": "WELLMUNE\u00AE",
+    "minimumRange": "50.00",
+    "reccomendedRange": "250.00",
+    "customerMaxRange": "300.00",
+    "pricePer30Servings": "223.80",
+    "overview": "Wellmune\u00AE  is a leading yeast beta glucan of a proprietary strain of baker\u0027s yeast. gluten-free.",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 134,
+    "name": "L-GLUTATHIONE",
+    "minimumRange": "100.00",
+    "reccomendedRange": "1000.00",
+    "customerMaxRange": "1200.00",
+    "pricePer30Servings": "366.94",
+    "overview": "reduced form",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 136,
+    "name": "CALCIUM (CALCIUM LACTATE)",
+    "minimumRange": "50.00",
+    "reccomendedRange": "500.00",
+    "customerMaxRange": "1000.00",
+    "pricePer30Servings": "135.82",
+    "overview": "",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 137,
+    "name": "VITAMIN B7 (BIOTIN)",
+    "minimumRange": "50.00",
+    "reccomendedRange": "500.00",
+    "customerMaxRange": "500.00",
+    "pricePer30Servings": "12.76",
+    "overview": "",
+    "unitOfMeasureName": "\u0026micro;g"
+  },
+  {
+    "ingredientId": 138,
+    "name": "FOS (FRUCTO-OLIGOSACCHARIDES)",
+    "minimumRange": "0.20",
+    "reccomendedRange": "1.00",
+    "customerMaxRange": "5.00",
+    "pricePer30Servings": "38.66",
+    "overview": "",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 139,
+    "name": "BETAINE",
+    "minimumRange": "100.00",
+    "reccomendedRange": "1000.00",
+    "customerMaxRange": "5000.00",
+    "pricePer30Servings": "34.10",
+    "overview": "Betaine (anhydrous) is a nutrient found naturally in the body. It is also known as trimethyleglycine (TMG)",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 141,
+    "name": "RHODIOLA ROSEA",
+    "minimumRange": "50.00",
+    "reccomendedRange": "150.00",
+    "customerMaxRange": "500.00",
+    "pricePer30Servings": "45.10",
+    "overview": "adaptogen, rosavin and salidroside",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 148,
+    "name": "L-THREONINE",
+    "minimumRange": "50.00",
+    "reccomendedRange": "100.00",
+    "customerMaxRange": "2000.00",
+    "pricePer30Servings": "17.31",
+    "overview": "",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 149,
+    "name": "L-PHENYLALANINE",
+    "minimumRange": "50.00",
+    "reccomendedRange": "100.00",
+    "customerMaxRange": "2000.00",
+    "pricePer30Servings": "20.09",
+    "overview": "BETTER SUITED TO SHAKES",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 150,
+    "name": "L-METHIONINE",
+    "minimumRange": "50.00",
+    "reccomendedRange": "100.00",
+    "customerMaxRange": "2000.00",
+    "pricePer30Servings": "17.14",
+    "overview": "ONLY AVAILABLE IN DRINKS",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 151,
+    "name": "L-LYSINE",
+    "minimumRange": "50.00",
+    "reccomendedRange": "1000.00",
+    "customerMaxRange": "2000.00",
+    "pricePer30Servings": "148.38",
+    "overview": "",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 152,
+    "name": "L-HISTIDINE HCL",
+    "minimumRange": "50.00",
+    "reccomendedRange": "100.00",
+    "customerMaxRange": "2000.00",
+    "pricePer30Servings": "33.94",
+    "overview": "",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 153,
+    "name": "L-TRYPTOPHAN",
+    "minimumRange": "25.00",
+    "reccomendedRange": "150.00",
+    "customerMaxRange": "220.00",
+    "pricePer30Servings": "82.73",
+    "overview": "",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 1147,
+    "name": "MALTODEXTRIN",
+    "minimumRange": "0.20",
+    "reccomendedRange": "10.00",
+    "customerMaxRange": "50.00",
+    "pricePer30Servings": "58.89",
+    "overview": "glucose",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 1162,
+    "name": "* VITAMIN BLEND (100% NRV)",
+    "minimumRange": "50.00",
+    "reccomendedRange": "200.00",
+    "customerMaxRange": "200.00",
+    "pricePer30Servings": "34.01",
+    "overview": "This vitamin blend contains 100% NRV* for the following vitamins at the recommended 200mg dosage:       Vitamin A 3000 IU   Vitamin B1 (Thiamine) 1.2mg   Vitamin B2 (Riboflavin) 1.3mg    Vitamin B3 (Nicotinamide) 16mg    Vitamin B5 (Pantothenic Acid) 5mg   Vitamin B6 (Pyridoxine) 1.7mg   Vitamin B7 (Biotin) 30\u00B5g   Vitamin B9 (Folic Acid) 400\u00B5g   Vitamin B12 2.4\u00B5g   Vitamin C 100mg   Vitamin D 630 IU   Vitamin E 16.7 IU      *for persons over the age of 4",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 1163,
+    "name": "CHOLINE BITARTRATE",
+    "minimumRange": "10.00",
+    "reccomendedRange": "250.00",
+    "customerMaxRange": "500.00",
+    "pricePer30Servings": "33.66",
+    "overview": "",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 1169,
+    "name": "* MINERAL BLEND",
+    "minimumRange": "200.00",
+    "reccomendedRange": "2265.00",
+    "customerMaxRange": "4531.00",
+    "pricePer30Servings": "66.76",
+    "overview": "TAILORBLEND\u0027s Mineral Blend contains the following minerals:       Chromium (Amino Acid Chelated) 25 \u00B5g   Copper (Amino Acid Chelated) 0.2 mg   Iron (Amino Acid Chelated) 5 mg   Manganese (Amino Acid Chelated) 1 mg   Molybdenum (Amino Acid Chelated) 50 \u00B5g   Selenium (Amino Acid Chelated) 25 \u00B5g   Zinc (Amino Acid Chelated) 10 mg   Calcium (Calcium Lactate) 216.6 mg   Magnesium (Magnesium Citrate) 50 mg   Iodine (Potassium Iodide) 100 \u00B5g",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 1170,
+    "name": "RICE PROTEIN",
+    "minimumRange": "1.00",
+    "reccomendedRange": "5.00",
+    "customerMaxRange": "20.00",
+    "pricePer30Servings": "47.62",
+    "overview": "ONLY FOR SHAKES. Our rice protein vegan shake contains the following amino acid profile:                Alanine     4,70%             Arginine     6,65%             Asparagine     6,78%             Aspartic Acid     6,89%             Cysteine     2,64%             Glutamic Acid     14,76%             Glycine     3,31%             Histidine     1,85%             Isoleucine     3,29%             Leucine     6,98%             Lysine     2,94%             Methionine     2,19%             Phenylalanine     4,40%             Proline     3,90%             Seleno-cysteine     1,40%             Serine     4,07%             Threonine     2,97%             Tryptophan     0,88%             Tyrosine     4,50%             Valine     4,42%                  *Add hemp protein to the Rice Protein Shake as an active ingredient to boost the protein content.",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 1173,
+    "name": "INOSITOL",
+    "minimumRange": "50.00",
+    "reccomendedRange": "400.00",
+    "customerMaxRange": "4000.00",
+    "pricePer30Servings": "46.84",
+    "overview": "",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 1174,
+    "name": "L-CARNITINE",
+    "minimumRange": "0.10",
+    "reccomendedRange": "0.50",
+    "customerMaxRange": "2.00",
+    "pricePer30Servings": "78.56",
+    "overview": "BETTER SUITED TO SHAKES",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 1178,
+    "name": "NUCLEOTIDES",
+    "minimumRange": "100.00",
+    "reccomendedRange": "500.00",
+    "customerMaxRange": "1000.00",
+    "pricePer30Servings": "574.49",
+    "overview": "",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 1187,
+    "name": "HMB (B-HYDROXY B-METHYLBUTYRATE)",
+    "minimumRange": "100.00",
+    "reccomendedRange": "1000.00",
+    "customerMaxRange": "2500.00",
+    "pricePer30Servings": "114.04",
+    "overview": "beta-hydroxy beta-methylbutyric acid",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 1188,
+    "name": "GRAPE SEED EXTRACT",
+    "minimumRange": "10.00",
+    "reccomendedRange": "100.00",
+    "customerMaxRange": "250.00",
+    "pricePer30Servings": "21.44",
+    "overview": "rich in antioxidants, including phenolic acids, anthocyanins, flavonoids and oligomeric proanthocyanidin complexes (OPCs",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 1192,
+    "name": "FRUCTOSE",
+    "minimumRange": "1.00",
+    "reccomendedRange": "10.00",
+    "customerMaxRange": "40.00",
+    "pricePer30Servings": "46.62",
+    "overview": "",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 1197,
+    "name": "EXOGENOUS KETONES (\u00DF-HYDROXYBUTYRATE)",
+    "minimumRange": "0.25",
+    "reccomendedRange": "6.00",
+    "customerMaxRange": "12.00",
+    "pricePer30Servings": "264.51",
+    "overview": "",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 1198,
+    "name": "BOSWELLIA SERRATA (65% B.A.)",
+    "minimumRange": "50.00",
+    "reccomendedRange": "200.00",
+    "customerMaxRange": "500.00",
+    "pricePer30Servings": "42.92",
+    "overview": "",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 1200,
+    "name": "ASHWAGANDHA",
+    "minimumRange": "50.00",
+    "reccomendedRange": "500.00",
+    "customerMaxRange": "1500.00",
+    "pricePer30Servings": "230.51",
+    "overview": "active constituents, including alkaloids and withanolides",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 1201,
+    "name": "MILK THISTLE",
+    "minimumRange": "50.00",
+    "reccomendedRange": "500.00",
+    "customerMaxRange": "1500.00",
+    "pricePer30Servings": "110.14",
+    "overview": "Milk Thistle (Silybum Marianum",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 1202,
+    "name": "NMN (\u00DF-NICOTINAMIDE MONONUCLEOTIDE)",
+    "minimumRange": "0.50",
+    "reccomendedRange": "250.00",
+    "customerMaxRange": "1000.00",
+    "pricePer30Servings": "263.22",
+    "overview": "",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 1203,
+    "name": "WHEY PROTEIN CONCENTRATE (GRASS FED)",
+    "minimumRange": "0.50",
+    "reccomendedRange": "5.00",
+    "customerMaxRange": "25.00",
+    "pricePer30Servings": "89.33",
+    "overview": "ONLY AVAILABLE IN SHAKES. Grass-Fed Whey Protein Concentrate contains the following amino acid profile:                 Alanine     4,55%             Arginine     2,35%             Aspartic Acid     1,94%             Cysteine     3,82%             Glutamic Acid     11,32%             Glycine     1,41%             Histidine     1,73%             Isoleucine     5,47%             Leucine     10,04%             Lysine     6,98%             Methionine     1,75%             Phenylalanine     3,13%             Proline     7,19%             Serine     4,96%             Threonine     4,05%             Tryptophan     3,33%             Tyrosine     0,94%             Valine     4,07%",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 1204,
+    "name": "* ESSENTIAL AMINO ACID BLEND",
+    "minimumRange": "350.00",
+    "reccomendedRange": "3500.00",
+    "customerMaxRange": "5000.00",
+    "pricePer30Servings": "153.93",
+    "overview": "L-Phenylalanine (15%) L-Valine (11%)L-Threonine (8%)L-Tryptophan (2%)L-Methionine (14%)L-Leucine (15%)L-Isoleucine (11%)L-Lysine HCL (13%): L-Histidine HCL (11%)",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 1205,
+    "name": "QUERCETIN",
+    "minimumRange": "50.00",
+    "reccomendedRange": "1000.00",
+    "customerMaxRange": "1500.00",
+    "pricePer30Servings": "340.36",
+    "overview": "flavanoid",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 1206,
+    "name": "HEMP PROTEIN",
+    "minimumRange": "1.00",
+    "reccomendedRange": "5.00",
+    "customerMaxRange": "20.00",
+    "pricePer30Servings": "137.88",
+    "overview": "ONLY FOR SHAKES. Following values per 100g: Alanine 2.24 g\\tArginene 6.82 g\\tAspartic acid 5.6 g\\tGlutamic acid 9.61 g Glycine 2.3 g Histidine 1.48 g Hydroxyproline < 0.05 g\\tIsoleucine 2.11 g\\tLeucine 3.48 g\\tLysine 1.85 g\\tOrnithine < 0.05 g\\tPhenylalanine 2.39 g\\tProline 2.10 g\\tSerine 2.66 g\\tThreonine 1.79 g\\tTyrosine 1.87 g\\tValine 2.57 g\\tCystein + Cystine 0.918 g\\tMethionine 1.41 g\\t",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 1208,
+    "name": "* ELECTROLYTE BLEND",
+    "minimumRange": "50.00",
+    "reccomendedRange": "715.00",
+    "customerMaxRange": "2000.00",
+    "pricePer30Servings": "43.12",
+    "overview": "Dosage per recommended 715mg:  Sodium citrate 500mg  Potassium chloride 150mg   Magnesium citrate 40mg  Calcium lactate 25mg  *values displayed on nutritional label may be affected by other ingredients",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 1212,
+    "name": "AGENANOVA\u00AE",
+    "minimumRange": "1.00",
+    "reccomendedRange": "10.00",
+    "customerMaxRange": "20.00",
+    "pricePer30Servings": "106.38",
+    "overview": "Agenanova is a new complex soluble carbohydrate derived from maltodextrin which can deliver prolonged and stable energy supply coupled with extraordinary low sugar content",
+    "unitOfMeasureName": "g"
+  },
+  {
+    "ingredientId": 1214,
+    "name": "VITAMIN B12 (METHYLCOBALAMIN)",
+    "minimumRange": "10.00",
+    "reccomendedRange": "24.00",
+    "customerMaxRange": "100.00",
+    "pricePer30Servings": "10.89",
+    "overview": "",
+    "unitOfMeasureName": "\u0026micro;g"
+  },
+  {
+    "ingredientId": 1218,
+    "name": "VITAMIN E (TOCOTRIENOL)",
+    "minimumRange": "5.00",
+    "reccomendedRange": "50.00",
+    "customerMaxRange": "100.00",
+    "pricePer30Servings": "210.08",
+    "overview": "",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 1219,
+    "name": "GLYCINE",
+    "minimumRange": "50.00",
+    "reccomendedRange": "3000.00",
+    "customerMaxRange": "5000.00",
+    "pricePer30Servings": "80.59",
+    "overview": "",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 1222,
+    "name": "MAGNESIUM (GLYCINATE)",
+    "minimumRange": "10.00",
+    "reccomendedRange": "200.00",
+    "customerMaxRange": "250.00",
+    "pricePer30Servings": "52.61",
+    "overview": "",
+    "unitOfMeasureName": "mg"
+  },
+  {
+    "ingredientId": 1224,
+    "name": "BORON",
+    "minimumRange": "0.50",
+    "reccomendedRange": "3.00",
+    "customerMaxRange": "3.00",
+    "pricePer30Servings": "20.53",
+    "overview": "",
+    "unitOfMeasureName": "mg"
+  }
+]

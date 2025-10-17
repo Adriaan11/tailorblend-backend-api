@@ -308,16 +308,33 @@ except Exception as e:
 logger.info("✅ State management initialized")
 
 # ============================================================================
+# Readiness State (for distinguishing liveness vs readiness probes)
+# ============================================================================
+
+# Liveness probe (/api/health): Always 200 after startup event
+# Readiness probe (/api/ready): Only 200 after warm-up complete
+is_ready = False
+
+# ============================================================================
 # Startup Events
 # ============================================================================
 
 @app.on_event("startup")
 async def startup_event():
-    """Log when the application is ready to handle requests."""
+    """
+    Mark application as ready for requests.
+    This fires AFTER uvicorn lifespan startup completes.
+    Heavy initialization (if any) should happen here without blocking.
+    """
+    global is_ready
     logger.info("=" * 80)
     logger.info("🎉 APPLICATION STARTUP EVENT TRIGGERED")
     logger.info("=" * 80)
     logger.info("✅ FastAPI app is now ready to handle requests")
+
+    # Mark as ready - /api/health will return 200 immediately
+    is_ready = True
+
     logger.info("✅ All lifespan events completed")
     logger.info("=" * 80)
 
@@ -351,15 +368,34 @@ def root():
 @app.get("/api/health")
 def health_check():
     """
-    Health check endpoint for container monitoring.
-    CRITICAL: Must be simple and fast - no async, minimal logging.
+    Liveness probe - MUST return 200 immediately after startup.
+    This is called by Railway/Docker to ensure app is alive.
+    No dependencies checked - purely confirms the process is running.
 
     Returns:
-        dict: Status and version info
+        dict: Simple status
     """
-    # Ultra-simple response - no complex logic
+    # Ultra-fast response - no logic, no checks
+    return {"status": "ok"}
+
+
+@app.get("/api/ready")
+def readiness_check():
+    """
+    Readiness probe - Returns 200 only when app is fully warm and ready for requests.
+    Use this for sophisticated load balancers/orchestrators.
+    Railway uses /api/health (liveness), not this endpoint.
+
+    Returns:
+        dict: Ready status and details
+    """
+    global is_ready
+    if not is_ready:
+        return {"ready": False, "status": "warming up"}, 503
+
     return {
-        "status": "ok",
+        "ready": True,
+        "status": "ready for requests",
         "service": "tailorblend-ai-consultant-api",
         "version": "1.0.0"
     }
@@ -895,82 +931,22 @@ async def reset_session(session_id: str = Form(..., description="Session identif
 
 def main():
     """
-    Main entry point for running the API server.
+    Main entry point for local development.
 
-    Runs on port 5000 (local) or PORT (Railway/container).
-    Railway uses PORT variable for health checks and routing.
+    NOTE: For Railway/Docker deployments, the Dockerfile CMD runs uvicorn directly:
+      CMD ["/bin/sh", "-lc", "uvicorn backend.api:app --host 0.0.0.0 --port ${PORT:-5000} --workers 4"]
+
+    For local development, run:
+      uvicorn backend.api:app --host 0.0.0.0 --port 5000 --workers 4
+      OR
+      python -m backend.api (if this main() is called)
     """
-    import os
-    import sys
-
     logger.info("=" * 80)
-    logger.info("🚀 STARTING TAILORBLEND AI CONSULTANT API SERVER")
+    logger.info("🚀 TAILORBLEND BACKEND API - LOCAL DEVELOPMENT")
     logger.info("=" * 80)
-    logger.info(f"Python version: {sys.version}")
-    logger.info(f"Executable: {sys.executable}")
-
-    # CRITICAL: Listen on PORT if set by Railway, else use PYTHON_API_PORT for local dev
-    # Railway sets PORT internally for health checks - we MUST listen on it
-    port_str = os.getenv("PORT") or os.getenv("PYTHON_API_PORT", "5000")
-    try:
-        port = int(port_str)
-        logger.info(f"📍 Port configuration:")
-        logger.info(f"   PORT env var: {os.getenv('PORT', 'NOT_SET')} (Railway)")
-        logger.info(f"   PYTHON_API_PORT env var: {os.getenv('PYTHON_API_PORT', 'NOT_SET')} (Local)")
-        logger.info(f"   ✅ Listening on: {port}")
-    except ValueError as e:
-        logger.error(f"❌ Invalid port value: {e}")
-        raise
-
-    logger.info(f"🎯 Ready to start Uvicorn on 0.0.0.0:{port}")
+    logger.info("ℹ️  For production, uvicorn is started by Docker/Railway")
+    logger.info("ℹ️  For local dev, consider running: uvicorn backend.api:app --reload")
     logger.info("=" * 80)
-    logger.info("✅ INITIALIZATION COMPLETE - Starting Uvicorn server...")
-    logger.info("=" * 80)
-
-    # Verify app is ready
-    logger.info(f"📦 App object: {app}")
-    logger.info(f"📦 App title: {app.title}")
-    logger.info(f"📦 App routes: {len(app.routes)} routes registered")
-    for route in app.routes:
-        logger.debug(f"   → {route.path if hasattr(route, 'path') else route}")
-
-    # Log Railway-provided environment variables for debugging
-    logger.info("=" * 80)
-    logger.info("🔗 Railway Environment Variables:")
-    railway_domain = os.getenv("RAILWAY_PUBLIC_DOMAIN", "NOT_SET")
-    railway_app_name = os.getenv("RAILWAY_SERVICE_NAME", "NOT_SET")
-    railway_app_id = os.getenv("RAILWAY_SERVICE_ID", "NOT_SET")
-    logger.info(f"   RAILWAY_PUBLIC_DOMAIN: {railway_domain}")
-    logger.info(f"   RAILWAY_SERVICE_NAME: {railway_app_name}")
-    logger.info(f"   RAILWAY_SERVICE_ID: {railway_app_id}")
-    if railway_domain and railway_domain != "NOT_SET":
-        logger.info(f"✅ PUBLIC URL: https://{railway_domain}")
-    else:
-        logger.warn("⚠️  RAILWAY_PUBLIC_DOMAIN not set - service may not be publicly accessible")
-    logger.info("=" * 80)
-
-    try:
-        # Run with uvicorn
-        logger.info(f"🚀 Uvicorn startup initiated on port {port}...")
-        logger.info("=" * 80)
-        logger.info("📡 LISTENING: Server should accept connections now")
-        logger.info("=" * 80)
-
-        # This is a blocking call - logs after this line won't show until shutdown
-        logger.info(f"🔧 Starting with 4 Uvicorn workers for concurrent request handling")
-        uvicorn.run(
-            app,
-            host="0.0.0.0",
-            port=port,
-            log_level="info",
-            access_log=True,
-            workers=4  # Multiple workers prevent single streaming request from blocking others
-        )
-    except Exception as e:
-        logger.error(f"❌ Failed to start Uvicorn: {e}", exc_info=True)
-        raise
-    finally:
-        logger.info("🛑 Uvicorn server stopped")
 
 
 if __name__ == "__main__":

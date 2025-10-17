@@ -40,6 +40,17 @@ logger.info("🚀 STARTUP: Initializing TailorBlend Backend API")
 # Import existing agent logic
 # Add parent directory to path for both local and Docker
 import os
+
+# Log important environment variables
+logger.info("=" * 80)
+logger.info("📊 Environment Configuration:")
+logger.info(f"   PYTHON_API_PORT: {os.getenv('PYTHON_API_PORT', 'NOT_SET')}")
+logger.info(f"   CORS_ALLOWED_ORIGINS: {os.getenv('CORS_ALLOWED_ORIGINS', 'NOT_SET')}")
+logger.info(f"   RAILWAY_PUBLIC_DOMAIN: {os.getenv('RAILWAY_PUBLIC_DOMAIN', 'NOT_SET')}")
+logger.info(f"   RAILWAY_SERVICE_NAME: {os.getenv('RAILWAY_SERVICE_NAME', 'NOT_SET')}")
+logger.info(f"   ASPNETCORE_ENVIRONMENT: {os.getenv('ASPNETCORE_ENVIRONMENT', 'NOT_SET')}")
+logger.info("=" * 80)
+
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 logger.debug(f"📂 Parent directory: {parent_dir}")
 if parent_dir not in sys.path:
@@ -946,6 +957,21 @@ def main():
     logger.info(f"📦 App routes: {len(app.routes)} routes registered")
     for route in app.routes:
         logger.debug(f"   → {route.path if hasattr(route, 'path') else route}")
+
+    # Log Railway-provided environment variables for debugging
+    logger.info("=" * 80)
+    logger.info("🔗 Railway Environment Variables:")
+    railway_domain = os.getenv("RAILWAY_PUBLIC_DOMAIN", "NOT_SET")
+    railway_app_name = os.getenv("RAILWAY_SERVICE_NAME", "NOT_SET")
+    railway_app_id = os.getenv("RAILWAY_SERVICE_ID", "NOT_SET")
+    logger.info(f"   RAILWAY_PUBLIC_DOMAIN: {railway_domain}")
+    logger.info(f"   RAILWAY_SERVICE_NAME: {railway_app_name}")
+    logger.info(f"   RAILWAY_SERVICE_ID: {railway_app_id}")
+    if railway_domain and railway_domain != "NOT_SET":
+        logger.info(f"✅ PUBLIC URL: https://{railway_domain}")
+    else:
+        logger.warn("⚠️  RAILWAY_PUBLIC_DOMAIN not set - service may not be publicly accessible")
+    logger.info("=" * 80)
 
     try:
         # Run with uvicorn

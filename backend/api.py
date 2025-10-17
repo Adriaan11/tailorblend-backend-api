@@ -282,7 +282,7 @@ async def lifespan(app: FastAPI):
     Key pattern: Kick off heavy init in background via asyncio.create_task(),
     then IMMEDIATELY yield so uvicorn stops returning 503.
 
-    Railway health checks will succeed because /api/health returns 200
+    Railway health checks will succeed because /health returns 200
     even while initialization runs in the background.
     """
     logger.info("=" * 80)
@@ -294,6 +294,17 @@ async def lifespan(app: FastAPI):
 
     logger.info("✅ LIFESPAN: Background initialization scheduled")
     logger.info("✅ LIFESPAN: Startup complete (non-blocking)")
+
+    # Debug: Print all registered routes
+    logger.info("📋 REGISTERED ROUTES:")
+    for route in app.routes:
+        try:
+            path = getattr(route, 'path', 'N/A')
+            methods = getattr(route, 'methods', 'N/A')
+            logger.info(f"   → {path} {methods}")
+        except Exception as e:
+            logger.debug(f"   → Route info unavailable: {e}")
+
     logger.info("=" * 80)
 
     # Yield immediately - uvicorn will stop returning 503
@@ -385,13 +396,22 @@ logger.info("✅ State management initialized")
 # Endpoints
 # ============================================================================
 
+@app.get("/health")
+def health():
+    """
+    Root-level health check for Railway liveness probe.
+    MUST be ultra-fast and ALWAYS return 200.
+    No dependencies, no checks - purely confirms process is alive.
+    """
+    return {"status": "ok"}
+
+
 @app.get("/ping")
 def ping():
     """
     Ultra-simple synchronous ping endpoint for debugging routing.
     No async, no complex logic - just returns immediately.
     """
-    logger.info("🔔 PING endpoint called (sync)")
     return {"pong": "ok"}
 
 

@@ -36,14 +36,15 @@ ENV PYTHON_API_PORT=5000
 EXPOSE 5000
 
 # Health check configuration
-# CRITICAL: Use ${PORT:-5000} to check the actual port the app is listening on
-# Railway sets PORT internally; if not set, fall back to 5000
+# CRITICAL: Simple /health endpoint (not /api/health) for Railway liveness
+# Use ${PORT:-5000} to check the actual port the app is listening on
 # Start period: 180s (3 minutes) for full app initialization including async startup
 HEALTHCHECK --interval=15s --timeout=10s --start-period=180s --retries=3 \
-    CMD curl -fsS http://127.0.0.1:${PORT:-5000}/api/health || exit 1
+    CMD curl -fsS http://127.0.0.1:${PORT:-5000}/health || exit 1
 
 # Run the FastAPI server using shell form to expand $PORT
 # This ensures uvicorn directly binds to 0.0.0.0:$PORT (Railway requirement)
 # Railway provides $PORT; local dev uses fallback 5000
 # Single worker prevents race conditions during heavy initialization
-CMD ["/bin/sh", "-lc", "uvicorn backend.api:app --host 0.0.0.0 --port ${PORT:-5000} --workers 1 --log-level info"]
+# DEBUG logging to diagnose startup issues
+CMD ["/bin/sh", "-lc", "uvicorn backend.api:app --host 0.0.0.0 --port ${PORT:-5000} --workers 1 --log-level debug"]

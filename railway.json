@@ -4,6 +4,10 @@
     "builder": "dockerfile"
   },
   "deploy": {
-    "startCommand": "python -m backend.api"
+    "startCommand": "python -m backend.api",
+    "healthcheckPath": "/api/health",
+    "healthcheckTimeout": 300,
+    "healthcheckInterval": 15,
+    "healthcheckGracePeriod": 90
   }
 }

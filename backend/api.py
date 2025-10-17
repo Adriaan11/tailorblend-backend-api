@@ -20,6 +20,7 @@ import json
 import mimetypes
 import logging
 from typing import Optional, Dict, List
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Query, Form, Request
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -227,14 +228,91 @@ def build_message_content(message: str, attachments: List[FileAttachment]) -> Li
     return content_items
 
 # ============================================================================
+# Readiness State (for distinguishing liveness vs readiness probes)
+# ============================================================================
+
+# Liveness probe (/api/health): Always 200 after startup event
+# Readiness probe (/api/ready): Only 200 after warm-up complete
+is_ready = False
+
+# ============================================================================
+# Background Initialization (Heavy Operations)
+# ============================================================================
+
+async def _heavy_init():
+    """
+    Background task for heavy initialization that must NOT block startup.
+
+    This includes:
+    - MultiAgentOrchestrator initialization
+    - Any other expensive setup
+
+    Called via asyncio.create_task() to run in background.
+    """
+    global multi_agent_orchestrator, is_ready
+
+    try:
+        logger.info("🔄 [BACKGROUND] Starting heavy initialization...")
+        logger.info("🤖 [BACKGROUND] Initializing MultiAgentOrchestrator...")
+
+        # This is the expensive operation that was blocking startup
+        multi_agent_orchestrator = MultiAgentOrchestrator()
+
+        logger.info("✅ [BACKGROUND] MultiAgentOrchestrator initialized successfully")
+        logger.info("✅ [BACKGROUND] Heavy initialization complete")
+
+        # Now mark as ready
+        is_ready = True
+        logger.info("🎉 [BACKGROUND] Application is now READY for full requests")
+
+    except Exception as e:
+        logger.error(f"❌ [BACKGROUND] Failed to initialize: {e}", exc_info=True)
+        # Don't raise - app can still serve health checks
+        # is_ready stays False, so /api/ready will return 503
+
+# ============================================================================
+# Lifespan Context Manager (Non-Blocking Startup)
+# ============================================================================
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Lifespan context manager for non-blocking startup.
+
+    Key pattern: Kick off heavy init in background via asyncio.create_task(),
+    then IMMEDIATELY yield so uvicorn stops returning 503.
+
+    Railway health checks will succeed because /api/health returns 200
+    even while initialization runs in the background.
+    """
+    logger.info("=" * 80)
+    logger.info("🚀 LIFESPAN: FastAPI startup initiated")
+    logger.info("=" * 80)
+
+    # Schedule heavy init in background - DO NOT AWAIT IT!
+    asyncio.create_task(_heavy_init())
+
+    logger.info("✅ LIFESPAN: Background initialization scheduled")
+    logger.info("✅ LIFESPAN: Startup complete (non-blocking)")
+    logger.info("=" * 80)
+
+    # Yield immediately - uvicorn will stop returning 503
+    yield
+
+    # Teardown (if needed)
+    logger.info("🛑 LIFESPAN: Shutdown initiated")
+    logger.info("=" * 80)
+
+# ============================================================================
 # Application Setup
 # ============================================================================
 
-logger.info("🏗️  Creating FastAPI application...")
+logger.info("🏗️  Creating FastAPI application with lifespan...")
 app = FastAPI(
     title="TailorBlend AI Consultant API",
     description="Backend API for OpenAI Agents SDK integration",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan  # Non-blocking startup!
 )
 logger.info("✅ FastAPI application created")
 
@@ -297,46 +375,11 @@ multi_agent_state: Dict[str, Dict] = {}
 logger.debug("✅ multi_agent_state initialized")
 
 # Multi-agent orchestrator instance (singleton)
-logger.info("🤖 Initializing MultiAgentOrchestrator...")
-try:
-    multi_agent_orchestrator = MultiAgentOrchestrator()
-    logger.info("✅ MultiAgentOrchestrator initialized successfully")
-except Exception as e:
-    logger.error(f"❌ Failed to initialize MultiAgentOrchestrator: {e}", exc_info=True)
-    raise
+# NOTE: Initialized in background during lifespan startup (non-blocking!)
+multi_agent_orchestrator: Optional[MultiAgentOrchestrator] = None
+logger.debug("✅ multi_agent_orchestrator placeholder created (will init in background)")
 
 logger.info("✅ State management initialized")
-
-# ============================================================================
-# Readiness State (for distinguishing liveness vs readiness probes)
-# ============================================================================
-
-# Liveness probe (/api/health): Always 200 after startup event
-# Readiness probe (/api/ready): Only 200 after warm-up complete
-is_ready = False
-
-# ============================================================================
-# Startup Events
-# ============================================================================
-
-@app.on_event("startup")
-async def startup_event():
-    """
-    Mark application as ready for requests.
-    This fires AFTER uvicorn lifespan startup completes.
-    Heavy initialization (if any) should happen here without blocking.
-    """
-    global is_ready
-    logger.info("=" * 80)
-    logger.info("🎉 APPLICATION STARTUP EVENT TRIGGERED")
-    logger.info("=" * 80)
-    logger.info("✅ FastAPI app is now ready to handle requests")
-
-    # Mark as ready - /api/health will return 200 immediately
-    is_ready = True
-
-    logger.info("✅ All lifespan events completed")
-    logger.info("=" * 80)
 
 # ============================================================================
 # Endpoints
@@ -859,6 +902,17 @@ async def multi_agent_blend_stream(request: MultiAgentBlendRequest):
     async def event_generator():
         """Generate SSE events from multi-agent workflow."""
         try:
+            # Check if orchestrator is initialized
+            if multi_agent_orchestrator is None:
+                error_step = AgentStep(
+                    agent_name="System",
+                    step_type="error",
+                    content="Service is still warming up. Please try again in a moment."
+                )
+                yield f"data: {error_step.model_dump_json()}\n\n"
+                yield "data: [DONE]\n\n"
+                return
+
             # Stream agent steps
             async for step in multi_agent_orchestrator.create_blend(request):
                 # Convert AgentStep to JSON

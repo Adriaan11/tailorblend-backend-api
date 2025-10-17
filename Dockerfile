@@ -45,4 +45,5 @@ HEALTHCHECK --interval=15s --timeout=10s --start-period=180s --retries=3 \
 # Run the FastAPI server using shell form to expand $PORT
 # This ensures uvicorn directly binds to 0.0.0.0:$PORT (Railway requirement)
 # Railway provides $PORT; local dev uses fallback 5000
-CMD ["/bin/sh", "-lc", "uvicorn backend.api:app --host 0.0.0.0 --port ${PORT:-5000} --workers 4"]
+# Single worker prevents race conditions during heavy initialization
+CMD ["/bin/sh", "-lc", "uvicorn backend.api:app --host 0.0.0.0 --port ${PORT:-5000} --workers 1 --log-level info"]

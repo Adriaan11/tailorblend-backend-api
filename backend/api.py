@@ -297,8 +297,61 @@ except Exception as e:
 logger.info("✅ State management initialized")
 
 # ============================================================================
+# Request Middleware Logging
+# ============================================================================
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    """Log all incoming requests for debugging."""
+    logger.info(f"📥 INCOMING REQUEST: {request.method} {request.url.path}")
+    try:
+        response = await call_next(request)
+        logger.info(f"📤 RESPONSE: {request.method} {request.url.path} -> {response.status_code}")
+        return response
+    except Exception as e:
+        logger.error(f"❌ REQUEST ERROR: {request.method} {request.url.path} -> {e}", exc_info=True)
+        raise
+
+# ============================================================================
+# Startup Events
+# ============================================================================
+
+@app.on_event("startup")
+async def startup_event():
+    """Log when the application is ready to handle requests."""
+    logger.info("=" * 80)
+    logger.info("🎉 APPLICATION STARTUP EVENT TRIGGERED")
+    logger.info("=" * 80)
+    logger.info("✅ FastAPI app is now ready to handle requests")
+    logger.info("✅ All lifespan events completed")
+    logger.info("=" * 80)
+
+# ============================================================================
 # Endpoints
 # ============================================================================
+
+@app.get("/ping")
+def ping():
+    """
+    Ultra-simple synchronous ping endpoint for debugging routing.
+    No async, no complex logic - just returns immediately.
+    """
+    logger.info("🔔 PING endpoint called (sync)")
+    return {"pong": "ok"}
+
+
+@app.get("/")
+def root():
+    """
+    Root endpoint for basic connectivity check.
+    """
+    logger.info("📍 ROOT endpoint called")
+    return {
+        "service": "TailorBlend AI Consultant API",
+        "status": "running",
+        "version": "1.0.0"
+    }
+
 
 @app.get("/api/health")
 async def health_check():
@@ -308,11 +361,24 @@ async def health_check():
     Returns:
         dict: Status and version info
     """
-    return {
-        "status": "ok",
-        "service": "tailorblend-ai-consultant-api",
-        "version": "1.0.0"
-    }
+    logger.info("🏥 Health check endpoint called (async)")
+    try:
+        logger.debug("  → Building response...")
+        response = {
+            "status": "ok",
+            "service": "tailorblend-ai-consultant-api",
+            "version": "1.0.0",
+            "timestamp": str(__import__('datetime').datetime.utcnow().isoformat())
+        }
+        logger.info(f"✅ Health check returning: {response}")
+        return response
+    except Exception as e:
+        logger.error(f"❌ Health check failed with error: {e}", exc_info=True)
+        return {
+            "status": "error",
+            "error": str(e),
+            "service": "tailorblend-ai-consultant-api"
+        }
 
 
 async def generate_chat_stream(
@@ -851,10 +917,13 @@ def main():
     Railway deployments use PORT environment variable.
     """
     import os
+    import sys
 
     logger.info("=" * 80)
     logger.info("🚀 STARTING TAILORBLEND AI CONSULTANT API SERVER")
     logger.info("=" * 80)
+    logger.info(f"Python version: {sys.version}")
+    logger.info(f"Executable: {sys.executable}")
 
     # Get port from environment
     # Use PYTHON_API_PORT for internal API (default 5000)
@@ -871,9 +940,21 @@ def main():
     logger.info("✅ INITIALIZATION COMPLETE - Starting Uvicorn server...")
     logger.info("=" * 80)
 
+    # Verify app is ready
+    logger.info(f"📦 App object: {app}")
+    logger.info(f"📦 App title: {app.title}")
+    logger.info(f"📦 App routes: {len(app.routes)} routes registered")
+    for route in app.routes:
+        logger.debug(f"   → {route.path if hasattr(route, 'path') else route}")
+
     try:
         # Run with uvicorn
         logger.info(f"🚀 Uvicorn startup initiated on port {port}...")
+        logger.info("=" * 80)
+        logger.info("📡 LISTENING: Server should accept connections now")
+        logger.info("=" * 80)
+
+        # This is a blocking call - logs after this line won't show until shutdown
         uvicorn.run(
             app,
             host="0.0.0.0",
@@ -884,6 +965,8 @@ def main():
     except Exception as e:
         logger.error(f"❌ Failed to start Uvicorn: {e}", exc_info=True)
         raise
+    finally:
+        logger.info("🛑 Uvicorn server stopped")
 
 
 if __name__ == "__main__":

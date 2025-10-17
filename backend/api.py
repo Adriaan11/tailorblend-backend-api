@@ -308,22 +308,6 @@ except Exception as e:
 logger.info("✅ State management initialized")
 
 # ============================================================================
-# Request Middleware Logging
-# ============================================================================
-
-@app.middleware("http")
-async def log_requests(request: Request, call_next):
-    """Log all incoming requests for debugging."""
-    logger.info(f"📥 INCOMING REQUEST: {request.method} {request.url.path}")
-    try:
-        response = await call_next(request)
-        logger.info(f"📤 RESPONSE: {request.method} {request.url.path} -> {response.status_code}")
-        return response
-    except Exception as e:
-        logger.error(f"❌ REQUEST ERROR: {request.method} {request.url.path} -> {e}", exc_info=True)
-        raise
-
-# ============================================================================
 # Startup Events
 # ============================================================================
 
@@ -365,31 +349,20 @@ def root():
 
 
 @app.get("/api/health")
-async def health_check():
+def health_check():
     """
     Health check endpoint for container monitoring.
+    CRITICAL: Must be simple and fast - no async, minimal logging.
 
     Returns:
         dict: Status and version info
     """
-    logger.info("🏥 Health check endpoint called (async)")
-    try:
-        logger.debug("  → Building response...")
-        response = {
-            "status": "ok",
-            "service": "tailorblend-ai-consultant-api",
-            "version": "1.0.0",
-            "timestamp": str(__import__('datetime').datetime.utcnow().isoformat())
-        }
-        logger.info(f"✅ Health check returning: {response}")
-        return response
-    except Exception as e:
-        logger.error(f"❌ Health check failed with error: {e}", exc_info=True)
-        return {
-            "status": "error",
-            "error": str(e),
-            "service": "tailorblend-ai-consultant-api"
-        }
+    # Ultra-simple response - no complex logic
+    return {
+        "status": "ok",
+        "service": "tailorblend-ai-consultant-api",
+        "version": "1.0.0"
+    }
 
 
 async def generate_chat_stream(

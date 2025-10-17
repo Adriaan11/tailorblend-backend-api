@@ -957,12 +957,14 @@ def main():
         logger.info("=" * 80)
 
         # This is a blocking call - logs after this line won't show until shutdown
+        logger.info(f"🔧 Starting with 4 Uvicorn workers for concurrent request handling")
         uvicorn.run(
             app,
             host="0.0.0.0",
             port=port,
             log_level="info",
-            access_log=True
+            access_log=True,
+            workers=4  # Multiple workers prevent single streaming request from blocking others
         )
     except Exception as e:
         logger.error(f"❌ Failed to start Uvicorn: {e}", exc_info=True)

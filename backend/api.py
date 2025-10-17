@@ -897,8 +897,8 @@ def main():
     """
     Main entry point for running the API server.
 
-    Runs on port 5000 (internal only, accessed by Blazor on localhost).
-    Railway deployments use PORT environment variable.
+    Runs on port 5000 (local) or PORT (Railway/container).
+    Railway uses PORT variable for health checks and routing.
     """
     import os
     import sys
@@ -909,14 +909,17 @@ def main():
     logger.info(f"Python version: {sys.version}")
     logger.info(f"Executable: {sys.executable}")
 
-    # Get port from environment
-    # Use PYTHON_API_PORT for internal API (default 5000)
-    # NOTE: Do NOT use PORT - that's for the public-facing Blazor service
+    # CRITICAL: Listen on PORT if set by Railway, else use PYTHON_API_PORT for local dev
+    # Railway sets PORT internally for health checks - we MUST listen on it
+    port_str = os.getenv("PORT") or os.getenv("PYTHON_API_PORT", "5000")
     try:
-        port = int(os.getenv("PYTHON_API_PORT", 5000))
-        logger.info(f"📍 Port configuration: PYTHON_API_PORT={port}")
+        port = int(port_str)
+        logger.info(f"📍 Port configuration:")
+        logger.info(f"   PORT env var: {os.getenv('PORT', 'NOT_SET')} (Railway)")
+        logger.info(f"   PYTHON_API_PORT env var: {os.getenv('PYTHON_API_PORT', 'NOT_SET')} (Local)")
+        logger.info(f"   ✅ Listening on: {port}")
     except ValueError as e:
-        logger.error(f"❌ Invalid PYTHON_API_PORT value: {e}")
+        logger.error(f"❌ Invalid port value: {e}")
         raise
 
     logger.info(f"🎯 Ready to start Uvicorn on 0.0.0.0:{port}")

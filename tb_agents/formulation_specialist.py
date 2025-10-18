@@ -8,62 +8,9 @@ The agent has complete access to all base mixes and their customization options
 loaded directly into its context.
 """
 
-import json
-from pathlib import Path
 from agents import Agent
 from backend.models import FormulationConfig, SupplementRecommendation
-
-
-def load_base_mixes_data() -> str:
-    """
-    Load BaseAddMixes2.json and format for agent context.
-
-    Returns formatted string containing all base mix and add-mix options
-    that the agent can reference when configuring the formulation.
-    """
-    project_root = Path(__file__).parent.parent
-    base_mixes_file = project_root / "spec" / "BaseAddMixes2.json"
-
-    with open(base_mixes_file, 'r') as f:
-        base_mixes = json.load(f)
-
-    # Group by baseMixId for clearer presentation
-    base_mix_groups = {}
-    for item in base_mixes:
-        base_id = item['baseMixId']
-        if base_id not in base_mix_groups:
-            base_mix_groups[base_id] = {
-                'name': item['baseMixName'],
-                'options': {}
-            }
-
-        add_type = item['addMixTypeName']
-        if add_type not in base_mix_groups[base_id]['options']:
-            base_mix_groups[base_id]['options'][add_type] = []
-
-        base_mix_groups[base_id]['options'][add_type].append({
-            'id': item['addMixId'],
-            'name': item['addMixName'],
-            'default': item['defaultFlag']
-        })
-
-    # Format as readable text
-    formatted_lines = ["AVAILABLE BASE MIXES & CUSTOMIZATION OPTIONS:", "=" * 80, ""]
-
-    for base_id, base_info in sorted(base_mix_groups.items()):
-        formatted_lines.append(f"\n{'*' * 80}")
-        formatted_lines.append(f"BASE MIX #{base_id}: {base_info['name']}")
-        formatted_lines.append(f"{'*' * 80}")
-
-        for add_type, options in sorted(base_info['options'].items()):
-            formatted_lines.append(f"\n  {add_type} Options:")
-            for opt in options:
-                default_marker = " [DEFAULT]" if opt['default'] else ""
-                formatted_lines.append(f"    - ID {opt['id']}: {opt['name']}{default_marker}")
-
-        formatted_lines.append("")  # Blank line between base mixes
-
-    return "\n".join(formatted_lines)
+from tb_agents.database_loader import load_base_mixes_database
 
 
 def create_formulation_specialist() -> Agent:
@@ -81,8 +28,9 @@ def create_formulation_specialist() -> Agent:
         Agent configured with full base mix database and product expertise
     """
 
-    # Load all base mixes into agent context
-    base_mixes_data = load_base_mixes_data()
+    # Load all base mixes into agent context from shared loader
+    # This uses module-level caching for performance
+    base_mixes_data = load_base_mixes_database()
 
     instructions = f"""You are a formulation specialist expert in TailorBlend product configuration.
 

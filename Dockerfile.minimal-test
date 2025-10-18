@@ -1,0 +1,19 @@
+# MINIMAL BINARY TEST - If this fails, Railway infrastructure is the issue
+# If this works, our app code is the issue
+
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install ONLY FastAPI and Uvicorn
+RUN pip install --no-cache-dir fastapi==0.115.5 uvicorn==0.32.1
+
+# Create minimal inline test app
+RUN echo 'from fastapi import FastAPI\nimport uvicorn\nimport os\n\napp = FastAPI()\n\n@app.get("/health")\ndef health():\n    return {"status": "ok", "test": "minimal-inline-app"}\n\nif __name__ == "__main__":\n    port = int(os.getenv("PORT", 5000))\n    print(f"MINIMAL TEST: Starting on port {port}")\n    uvicorn.run(app, host="0.0.0.0", port=port, log_level="debug")' > minimal_test.py
+
+EXPOSE 5000
+
+HEALTHCHECK --interval=15s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -fsS http://127.0.0.1:${PORT:-5000}/health || exit 1
+
+CMD ["python", "minimal_test.py"]

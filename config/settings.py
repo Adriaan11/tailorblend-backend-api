@@ -90,11 +90,11 @@ if not OPENAI_API_KEY:
         "Please set it in .env file or environment variables."
     )
 
-# Vector Store Configuration
-# This vector store contains:
-# - ingredients-database.md (111 ingredients with dosages, constraints, categories)
-# - base-add-mixes-database.md (4 base mixes, 68 customization options)
-VECTOR_STORE_ID = "vs_68ee8e3a25a48191aa18ff9c1dddbc01"
+# Vector Store Configuration (DEPRECATED - No longer used)
+# The consultant agent now loads JSON databases directly into memory.
+# This eliminates the external vector store dependency.
+# Keeping this constant for backward compatibility in case old code references it.
+VECTOR_STORE_ID = "vs_68ee8e3a25a48191aa18ff9c1dddbc01"  # DEPRECATED
 
 # Conversation Configuration
 MAX_CONVERSATION_TURNS = 50  # Allow full consultation with plenty of back-and-forth

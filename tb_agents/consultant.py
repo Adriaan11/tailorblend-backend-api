@@ -11,8 +11,9 @@ This agent:
 4. Provides expert recommendations with reasoning
 """
 
-from agents import Agent, FileSearchTool
-from config.settings import load_instructions, VECTOR_STORE_ID
+from agents import Agent
+from config.settings import load_instructions
+from tb_agents.database_loader import get_combined_database
 
 
 def create_tailorblend_consultant(custom_instructions: str = None, model: str = "gpt-4.1-mini-2025-04-14") -> Agent:
@@ -27,7 +28,7 @@ def create_tailorblend_consultant(custom_instructions: str = None, model: str = 
     - Technical requirements (base mix types, add-mix selection, ingredient constraints)
     - API integration specs (when implemented)
 
-    The agent uses file_search to query a vector store containing:
+    The agent has direct access to the complete database loaded into memory:
     - 111 ingredients with dosages, constraints, and health categories
     - 4 base mix types with 68 customization options
 
@@ -72,26 +73,26 @@ def create_tailorblend_consultant(custom_instructions: str = None, model: str = 
         # This is the "system prompt" containing all business logic
         instructions = load_instructions()
 
-    # Create file search tool connected to vector store
-    # The vector store contains ingredients and base mix databases
-    file_search = FileSearchTool(
-        vector_store_ids=[VECTOR_STORE_ID],
-        max_num_results=30  # Return top 30 most relevant results for comprehensive formulation
-    )
+    # Load complete database into agent memory
+    # This gives the agent instant access to all ingredients and base mixes
+    # without needing to query an external vector store
+    database_context = get_combined_database()
 
-    # Create agent with file_search access to vector store
+    # Append database to instructions so agent has full context
+    full_instructions = f"{instructions}\n\n{database_context}"
+
+    # Create agent with complete database in memory
     agent = Agent(
         name="TailorBlend Consultant",
-        instructions=instructions,
+        instructions=full_instructions,
 
         # Use specified model (defaults to GPT-4.1 mini)
         # Model can be changed via API parameter for different performance/cost tradeoffs
         model=model,
 
-        # Enable file search for vector store queries
-        # Agent can query: "Find ingredients for energy and focus"
-        # or: "What are the default add-mixes for Drink base?"
-        tools=[file_search],
+        # No tools needed - all data is in the agent's context
+        # This simplifies the architecture and eliminates vector store dependency
+        tools=[],
 
         # No output_type specified = free-form conversation
         # Agent will naturally conclude when formulation is complete

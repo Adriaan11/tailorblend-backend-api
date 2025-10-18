@@ -8,48 +8,9 @@ The agent has complete access to all 112 ingredients with their dosage ranges,
 costs, and constraints loaded directly into its context.
 """
 
-import json
-from pathlib import Path
 from agents import Agent
 from backend.models import SupplementRecommendation
-
-
-def load_ingredients_data() -> str:
-    """
-    Load Ingredients3.json and format for agent context.
-
-    Returns formatted string containing all ingredient data that the agent
-    can reference when making selections.
-    """
-    # Get path to spec folder (go up from tb_agents to project root, then into spec)
-    project_root = Path(__file__).parent.parent
-    ingredients_file = project_root / "spec" / "Ingredients3.json"
-
-    with open(ingredients_file, 'r') as f:
-        ingredients = json.load(f)
-
-    # Format ingredients as readable text for agent
-    formatted_lines = ["AVAILABLE INGREDIENTS DATABASE:", "=" * 80, ""]
-
-    for ing in ingredients:
-        # Get fields with safe fallbacks
-        name = ing.get('name', 'Unknown')
-        min_range = ing.get('minimumRange', ing.get('minimumrange', 'N/A'))
-        rec_range = ing.get('reccomendedRange', ing.get('reccomendedrange', 'N/A'))
-        max_range = ing.get('customerMaxRange', ing.get('customermaxrange', 'N/A'))
-        unit = ing.get('unitOfMeasureName', ing.get('unitofmeasurename', 'units'))
-        cost = ing.get('pricePer30Servings', ing.get('priceper30servings', '0.00'))
-        overview = ing.get('overview', '')
-
-        formatted_lines.append(f"• {name}")
-        formatted_lines.append(f"  Dosage Range: {min_range} - {rec_range} {unit}")
-        formatted_lines.append(f"  Max (Customer): {max_range} {unit}")
-        formatted_lines.append(f"  Cost (30 servings): R{cost}")
-        if overview:
-            formatted_lines.append(f"  Notes: {overview}")
-        formatted_lines.append("")  # Blank line between ingredients
-
-    return "\n".join(formatted_lines)
+from tb_agents.database_loader import load_ingredients_database
 
 
 def create_supplement_specialist() -> Agent:
@@ -67,8 +28,9 @@ def create_supplement_specialist() -> Agent:
         Agent configured with full ingredient database and clinical expertise
     """
 
-    # Load all ingredients into agent context
-    ingredients_data = load_ingredients_data()
+    # Load all ingredients into agent context from shared loader
+    # This uses module-level caching for performance
+    ingredients_data = load_ingredients_database()
 
     instructions = f"""You are a clinical supplement specialist with expertise in personalized nutrition.
 

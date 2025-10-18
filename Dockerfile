@@ -29,22 +29,19 @@ COPY instruction_parser.py token_counter.py ./
 RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
 USER appuser
 
-# Default port for local development
+# Default port for local development (overridden by fly.toml PYTHON_API_PORT=8080)
 ENV PYTHON_API_PORT=5000
 
-# Expose 5000 for documentation (Railway uses $PORT at runtime, but this is for reference)
-EXPOSE 5000
+# Expose ports for documentation
+EXPOSE 5000 8080
 
 # Health check configuration
-# CRITICAL: Simple /health endpoint (not /api/health) for Railway liveness
-# Use ${PORT:-5000} to check the actual port the app is listening on
+# Uses PYTHON_API_PORT which is set by fly.toml (8080) or defaults to 5000 locally
 # Start period: 180s (3 minutes) for full app initialization including async startup
 HEALTHCHECK --interval=15s --timeout=10s --start-period=180s --retries=3 \
-    CMD curl -fsS http://127.0.0.1:${PORT:-5000}/health || exit 1
+    CMD curl -fsS http://127.0.0.1:${PYTHON_API_PORT:-5000}/health || exit 1
 
-# Run the FastAPI server using shell form to expand $PORT
-# This ensures uvicorn directly binds to 0.0.0.0:$PORT (Railway requirement)
-# Railway provides $PORT; local dev uses fallback 5000
+# Run the FastAPI server
+# Uses PYTHON_API_PORT from environment (fly.toml sets to 8080, local defaults to 5000)
 # Single worker prevents race conditions during heavy initialization
-# DEBUG logging to diagnose startup issues
-CMD ["/bin/sh", "-lc", "uvicorn backend.api:app --host 0.0.0.0 --port ${PORT:-5000} --workers 1 --log-level debug"]
+CMD ["/bin/sh", "-lc", "uvicorn backend.api:app --host 0.0.0.0 --port ${PYTHON_API_PORT:-5000} --workers 1 --log-level info"]

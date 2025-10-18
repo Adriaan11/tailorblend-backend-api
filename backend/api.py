@@ -470,7 +470,8 @@ async def generate_chat_stream(
     custom_instructions: Optional[str] = None,
     model: str = "gpt-4.1-mini-2025-04-14",
     attachments: List[FileAttachment] = [],
-    practitioner_mode: bool = False
+    practitioner_mode: bool = False,
+    request: Optional[Request] = None
 ):
     """
     Core chat streaming logic (shared between GET and POST endpoints).
@@ -572,8 +573,23 @@ async def generate_chat_stream(
         # Accumulate response for token counting
         accumulated_response = ""
 
+        # Track time for keepalive mechanism
+        from datetime import datetime
+        last_keepalive = datetime.now()
+
         # Stream tokens as SSE events
         async for event in result.stream_events():
+            # Check if client has disconnected (early termination)
+            if request and await request.is_disconnected():
+                print(f"🔌 [API] Client disconnected for session {session_id}, stopping stream", file=sys.stderr)
+                break
+
+            # Send keepalive if no activity for 15 seconds
+            # This prevents fly.io proxy from closing idle connections
+            if (datetime.now() - last_keepalive).total_seconds() > 15:
+                yield f": keepalive\n\n"  # SSE comment (ignored by clients)
+                last_keepalive = datetime.now()
+
             if (
                 event.type == "raw_response_event" and
                 isinstance(event.data, ResponseTextDeltaEvent)
@@ -583,6 +599,9 @@ async def generate_chat_stream(
 
                 # Send SSE event
                 yield f"data: {json.dumps(token)}\n\n"
+
+                # Reset keepalive timer on activity
+                last_keepalive = datetime.now()
 
         # Store conversation state
         if session_id not in conversation_state:
@@ -640,11 +659,19 @@ async def generate_chat_stream(
         # Send error event
         error_message = f"Error: {str(e)}"
         print(f"❌ [API] Streaming error: {error_message}", file=sys.stderr)
-        yield f"data: {json.dumps(error_message)}\n\n"
+
+        # Sanitize error message - don't expose internal details to users
+        user_error_message = "We're having trouble processing your request. Please try again in a moment."
+        yield f"data: {json.dumps(user_error_message)}\n\n"
+
+        # CRITICAL: Always send [DONE] signal, even after errors
+        # This ensures the frontend knows the stream has terminated
+        yield f"data: [DONE]\n\n"
 
 
 @app.get("/api/chat/stream")
 async def stream_chat_get(
+    request: Request,
     message: str = Query(..., description="User message"),
     session_id: str = Query(..., description="Session identifier"),
     custom_instructions: Optional[str] = Query(None, description="Custom instructions override"),
@@ -657,6 +684,7 @@ async def stream_chat_get(
     For messages with file attachments, use the POST endpoint.
 
     Args:
+        request: FastAPI Request object (for disconnect detection)
         message: User's message
         session_id: Session identifier for conversation continuity
         custom_instructions: Optional custom instructions from Configuration editor
@@ -666,7 +694,7 @@ async def stream_chat_get(
         StreamingResponse: SSE stream of response tokens
     """
     return StreamingResponse(
-        generate_chat_stream(message, session_id, custom_instructions, model, []),
+        generate_chat_stream(message, session_id, custom_instructions, model, [], request=request),
         media_type="text/event-stream",
         headers={
             "Cache-Control": "no-cache",
@@ -677,7 +705,7 @@ async def stream_chat_get(
 
 
 @app.post("/api/chat/stream")
-async def stream_chat_post(request: ChatRequest):
+async def stream_chat_post(chat_request: ChatRequest, request: Request):
     """
     Stream chat response using Server-Sent Events (SSE) - POST endpoint.
 
@@ -685,7 +713,8 @@ async def stream_chat_post(request: ChatRequest):
     Accepts JSON body with message, session_id, and optional attachments.
 
     Args:
-        request: Chat request with message and optional attachments
+        chat_request: Chat request with message and optional attachments
+        request: FastAPI Request object (for disconnect detection)
 
     Returns:
         StreamingResponse: SSE stream of response tokens
@@ -693,23 +722,24 @@ async def stream_chat_post(request: ChatRequest):
     try:
         # Log incoming request details
         print(f"📨 [POST /api/chat/stream] Received request:", file=sys.stderr)
-        print(f"  - Message: {request.message[:50]}..." if len(request.message) > 50 else f"  - Message: {request.message}", file=sys.stderr)
-        print(f"  - Session ID: {request.session_id}", file=sys.stderr)
-        print(f"  - Model: {request.model}", file=sys.stderr)
-        print(f"  - Attachments: {len(request.attachments)} file(s)", file=sys.stderr)
+        print(f"  - Message: {chat_request.message[:50]}..." if len(chat_request.message) > 50 else f"  - Message: {chat_request.message}", file=sys.stderr)
+        print(f"  - Session ID: {chat_request.session_id}", file=sys.stderr)
+        print(f"  - Model: {chat_request.model}", file=sys.stderr)
+        print(f"  - Attachments: {len(chat_request.attachments)} file(s)", file=sys.stderr)
 
-        for i, attachment in enumerate(request.attachments):
+        for i, attachment in enumerate(chat_request.attachments):
             print(f"    [{i+1}] {attachment.filename} ({attachment.mime_type}, {attachment.file_size} bytes)", file=sys.stderr)
             print(f"        Base64 data length: {len(attachment.base64_data)} chars", file=sys.stderr)
 
         return StreamingResponse(
             generate_chat_stream(
-                request.message,
-                request.session_id,
-                request.custom_instructions,
-                request.model,
-                request.attachments,
-                request.practitioner_mode
+                chat_request.message,
+                chat_request.session_id,
+                chat_request.custom_instructions,
+                chat_request.model,
+                chat_request.attachments,
+                chat_request.practitioner_mode,
+                request=request
             ),
             media_type="text/event-stream",
             headers={

@@ -93,6 +93,22 @@ except Exception as e:
     raise
 
 try:
+    logger.debug("→ Importing agents.tracing")
+    from agents.tracing import add_trace_processor
+    logger.debug("✅ agents.tracing imported")
+except Exception as e:
+    logger.error(f"❌ Failed to import agents.tracing: {e}", exc_info=True)
+    raise
+
+try:
+    logger.debug("→ Importing trace_processor")
+    from backend.trace_processor import trace_processor
+    logger.debug("✅ trace_processor imported")
+except Exception as e:
+    logger.error(f"❌ Failed to import trace_processor: {e}", exc_info=True)
+    raise
+
+try:
     logger.debug("→ Importing openai.types.responses")
     from openai.types.responses import ResponseTextDeltaEvent
     logger.debug("✅ openai.types.responses imported")
@@ -263,6 +279,7 @@ async def _heavy_init():
 
     This includes:
     - MultiAgentOrchestrator initialization
+    - TracingProcessor registration
     - Any other expensive setup
 
     Called via asyncio.create_task() to run in background.
@@ -271,6 +288,12 @@ async def _heavy_init():
 
     try:
         logger.info("🔄 [BACKGROUND] Starting heavy initialization...")
+
+        # Register trace processor globally
+        logger.info("📊 [BACKGROUND] Registering trace processor...")
+        add_trace_processor(trace_processor)
+        logger.info("✅ [BACKGROUND] Trace processor registered")
+
         logger.info("🤖 [BACKGROUND] Initializing MultiAgentOrchestrator...")
 
         # This is the expensive operation that was blocking startup
@@ -574,6 +597,12 @@ async def generate_chat_stream(
                     previous_response_id=previous_response_id
                 )
                 print(f"✅ [API] Runner.run_streamed initiated successfully", file=sys.stderr)
+
+                # Associate trace with session for tracing
+                if hasattr(result, 'trace_id'):
+                    trace_processor.set_session_id(result.trace_id, session_id)
+                    print(f"📊 [TRACE] Associated trace {result.trace_id} with session {session_id}", file=sys.stderr)
+
             except Exception as e:
                 print(f"❌ [API] Error building/running message with attachments: {type(e).__name__}: {str(e)}", file=sys.stderr)
                 import traceback
@@ -587,6 +616,11 @@ async def generate_chat_stream(
                 actual_message,
                 previous_response_id=previous_response_id
             )
+
+            # Associate trace with session for tracing
+            if hasattr(result, 'trace_id'):
+                trace_processor.set_session_id(result.trace_id, session_id)
+                print(f"📊 [TRACE] Associated trace {result.trace_id} with session {session_id}", file=sys.stderr)
 
         # Accumulate response for token counting
         accumulated_response = ""
@@ -1154,10 +1188,77 @@ async def multi_agent_blend_stream(request: MultiAgentBlendRequest):
     )
 
 
+@app.get("/api/session/{session_id}/traces/stream")
+async def stream_traces(session_id: str):
+    """
+    Stream trace updates via Server-Sent Events (SSE).
+
+    Real-time streaming of trace data as consultations execute.
+    Keeps connection open until client disconnects.
+
+    Args:
+        session_id: Session identifier
+
+    Returns:
+        StreamingResponse: SSE stream of trace events
+    """
+    print(f"📊 [TRACE-STREAM] Client connected for session: {session_id}", file=sys.stderr)
+
+    async def event_generator():
+        # Subscribe to trace updates
+        queue = await trace_processor.subscribe_to_traces(session_id)
+
+        try:
+            while True:
+                # Wait for next trace update
+                trace_data = await queue.get()
+
+                # Format as SSE event
+                import json
+                event_data = json.dumps(trace_data)
+                yield f"data: {event_data}\n\n"
+
+        except asyncio.CancelledError:
+            print(f"📊 [TRACE-STREAM] Client disconnected for session: {session_id}", file=sys.stderr)
+            # Unsubscribe from updates
+            trace_processor.unsubscribe_from_traces(session_id, queue)
+            raise
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no"  # Disable nginx buffering
+        }
+    )
+
+
+@app.get("/api/session/{session_id}/traces")
+async def get_traces(session_id: str):
+    """
+    Get all traces for a session.
+
+    Args:
+        session_id: Session identifier
+
+    Returns:
+        dict: List of traces
+    """
+    traces = trace_processor.get_traces(session_id)
+
+    return {
+        "session_id": session_id,
+        "traces": traces,
+        "count": len(traces)
+    }
+
+
 @app.post("/api/session/reset")
 async def reset_session(session_id: str = Form(..., description="Session identifier to reset")):
     """
-    Reset session state (clear conversation history).
+    Reset session state (clear conversation history and traces).
 
     Args:
         session_id: Session identifier to reset (sent as form data)
@@ -1172,6 +1273,10 @@ async def reset_session(session_id: str = Form(..., description="Session identif
         print(f"✅ [RESET] Session {session_id} deleted from state", file=sys.stderr)
     else:
         print(f"⚠️ [RESET] Session {session_id} not found in state", file=sys.stderr)
+
+    # Also clear traces
+    trace_processor.clear_session(session_id)
+    print(f"📊 [RESET] Traces cleared for session {session_id}", file=sys.stderr)
 
     return {
         "success": True,

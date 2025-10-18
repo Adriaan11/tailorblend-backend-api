@@ -6,6 +6,7 @@ Captures full trace data from OpenAI Agents SDK for comprehensive observability.
 """
 
 import asyncio
+import sys
 import time
 import threading
 from typing import Any, Dict, List, Optional
@@ -41,8 +42,8 @@ class InMemoryTraceProcessor(TracingProcessor):
         # Active spans being built: span_id -> span data
         self._active_spans: Dict[str, Dict[str, Any]] = {}
 
-        # Broadcast channels for SSE: session_id -> asyncio.Queue
-        self._broadcast_queues: Dict[str, List[asyncio.Queue]] = defaultdict(list)
+        # Broadcast channels for SSE: session_id -> list of (queue, event_loop) tuples
+        self._broadcast_queues: Dict[str, List[tuple[asyncio.Queue, asyncio.AbstractEventLoop]]] = defaultdict(list)
 
         # Session ID tracking: trace_id -> session_id
         self._trace_sessions: Dict[str, str] = {}
@@ -195,18 +196,37 @@ class InMemoryTraceProcessor(TracingProcessor):
 
         return result
 
+    async def _async_put_in_queue(self, queue: asyncio.Queue, data: Dict[str, Any]) -> None:
+        """Async helper to put data in queue (handles full queue gracefully)."""
+        try:
+            await asyncio.wait_for(queue.put(data), timeout=0.1)
+        except asyncio.TimeoutError:
+            # Queue is full and client is slow - drop this update
+            pass
+        except Exception:
+            # Queue or client disconnected - ignore
+            pass
+
     def _broadcast_trace_update(self, session_id: str, trace_data: Dict[str, Any]) -> None:
-        """Broadcast trace update to all SSE subscribers (non-blocking)."""
+        """Broadcast trace update to all SSE subscribers (thread-safe)."""
         if session_id not in self._broadcast_queues:
             return
 
         # Put trace in all active queues for this session
-        for queue in self._broadcast_queues[session_id]:
+        for queue, loop in self._broadcast_queues[session_id]:
             try:
-                queue.put_nowait(trace_data)
-            except asyncio.QueueFull:
-                # Drop if queue full (slow client)
+                # Schedule the put operation in the queue's event loop (thread-safe)
+                # This allows synchronous tracing callbacks to safely update async queues
+                asyncio.run_coroutine_threadsafe(
+                    self._async_put_in_queue(queue, trace_data),
+                    loop
+                )
+            except RuntimeError:
+                # Event loop is closed or not running - subscriber disconnected
                 pass
+            except Exception as e:
+                # Log but don't crash on broadcast errors
+                print(f"⚠️ [TRACE] Failed to broadcast trace: {e}", file=sys.stderr)
 
     def get_traces(self, session_id: str) -> List[Dict[str, Any]]:
         """Get all traces for a session."""
@@ -226,20 +246,25 @@ class InMemoryTraceProcessor(TracingProcessor):
         Returns an asyncio.Queue that receives trace updates.
         """
         queue = asyncio.Queue(maxsize=100)
+        loop = asyncio.get_running_loop()
 
         with self._lock:
-            self._broadcast_queues[session_id].append(queue)
+            self._broadcast_queues[session_id].append((queue, loop))
 
+        print(f"📊 [TRACE] Subscribed to traces for session {session_id}", file=sys.stderr)
         return queue
 
     def unsubscribe_from_traces(self, session_id: str, queue: asyncio.Queue) -> None:
         """Unsubscribe from trace updates."""
         with self._lock:
             if session_id in self._broadcast_queues:
-                try:
-                    self._broadcast_queues[session_id].remove(queue)
-                except ValueError:
-                    pass  # Already removed
+                # Remove the tuple containing this queue
+                self._broadcast_queues[session_id] = [
+                    (q, loop) for q, loop in self._broadcast_queues[session_id]
+                    if q is not queue
+                ]
+
+        print(f"📊 [TRACE] Unsubscribed from traces for session {session_id}", file=sys.stderr)
 
     def shutdown(self) -> None:
         """Clean shutdown."""

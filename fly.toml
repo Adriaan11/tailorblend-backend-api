@@ -1,7 +1,7 @@
 # fly.toml - TailorBlend AI Consultant Backend API
 # Deployment configuration for fly.io
 
-app = "tailorblend-api"
+app = "tailorblend-backend-api"
 primary_region = "jnb"  # Johannesburg, South Africa
 
 [build]
@@ -31,10 +31,17 @@ primary_region = "jnb"  # Johannesburg, South Africa
     timeout = "5s"
     path = "/api/health"
 
-# VM configuration
+# VM configuration - Optimized for cost (cheapest always-on option)
+# shared-cpu-1x with 256MB = $2.02/month (was $3.32 with 512MB)
+# Suitable for low-traffic personal/testing use
+# If you experience OOM errors, upgrade to 512MB
 [vm]
   size = "shared-cpu-1x"
-  memory = "512mb"
+  memory = "256mb"
+
+# Swap provides emergency buffer if 256MB RAM is insufficient
+# This prevents crashes during memory spikes (e.g., OpenAI SDK initialization)
+swap_size_mb = 512
 
 # Environment variables for production
 [env.CORS_ALLOWED_ORIGINS]

@@ -85,11 +85,11 @@ except Exception as e:
     raise
 
 try:
-    logger.debug("→ Importing agents.Runner")
-    from agents import Runner
-    logger.debug("✅ agents.Runner imported")
+    logger.debug("→ Importing agents.Runner, ModelSettings, RunConfig")
+    from agents import Runner, ModelSettings, RunConfig
+    logger.debug("✅ agents.Runner, ModelSettings, RunConfig imported")
 except Exception as e:
-    logger.error(f"❌ Failed to import agents.Runner: {e}", exc_info=True)
+    logger.error(f"❌ Failed to import agents modules: {e}", exc_info=True)
     raise
 
 try:
@@ -512,6 +512,7 @@ async def generate_chat_stream(
     model: str = "gpt-4.1-mini-2025-04-14",
     attachments: List[FileAttachment] = [],
     practitioner_mode: bool = False,
+    model_settings: Optional[Dict] = None,
     request: Optional[Request] = None
 ):
     """
@@ -526,6 +527,7 @@ async def generate_chat_stream(
         model: OpenAI model to use
         attachments: List of file attachments
         practitioner_mode: Use practitioner-specific instructions if True
+        model_settings: Optional model configuration settings (temperature, max_tokens, etc.)
 
     Yields:
         str: SSE formatted messages ("data: {token}\n\n")
@@ -552,6 +554,32 @@ async def generate_chat_stream(
             custom_instructions=instructions_to_use,
             model=model
         )
+
+        # Convert model_settings dict to ModelSettings object if provided
+        settings_obj = None
+        if model_settings:
+            print(f"⚙️  [API] Applying model settings: {model_settings}", file=sys.stderr)
+            settings_obj = ModelSettings(
+                temperature=model_settings.get("temperature"),
+                top_p=model_settings.get("top_p"),
+                frequency_penalty=model_settings.get("frequency_penalty"),
+                presence_penalty=model_settings.get("presence_penalty"),
+                max_tokens=model_settings.get("max_tokens"),
+                verbosity=model_settings.get("verbosity"),
+                tool_choice=model_settings.get("tool_choice"),
+                parallel_tool_calls=model_settings.get("parallel_tool_calls"),
+                truncation=model_settings.get("truncation"),
+                store=model_settings.get("store"),
+                include_usage=model_settings.get("include_usage"),
+                top_logprobs=model_settings.get("top_logprobs"),
+                metadata=model_settings.get("metadata")
+            )
+
+        # Create RunConfig with model settings
+        run_config = RunConfig(
+            model_settings=settings_obj,
+            workflow_name="TailorBlend Consultation"
+        ) if settings_obj else None
 
         # Get conversation context
         previous_response_id = None
@@ -594,7 +622,8 @@ async def generate_chat_stream(
                 result = Runner.run_streamed(
                     agent,
                     message_list,
-                    previous_response_id=previous_response_id
+                    previous_response_id=previous_response_id,
+                    run_config=run_config
                 )
                 print(f"✅ [API] Runner.run_streamed initiated successfully", file=sys.stderr)
 
@@ -614,7 +643,8 @@ async def generate_chat_stream(
             result = Runner.run_streamed(
                 agent,
                 actual_message,
-                previous_response_id=previous_response_id
+                previous_response_id=previous_response_id,
+                run_config=run_config
             )
 
             # Associate trace with session for tracing
@@ -767,6 +797,7 @@ async def chat_post(chat_request: ChatRequest, request: Request):
                     chat_request.model,
                     chat_request.attachments,
                     chat_request.practitioner_mode,
+                    model_settings=chat_request.model_settings.model_dump() if chat_request.model_settings else None,
                     request=request
                 ):
                     chunk_count += 1
@@ -922,6 +953,7 @@ async def stream_chat_post(chat_request: ChatRequest, request: Request):
                 chat_request.model,
                 chat_request.attachments,
                 chat_request.practitioner_mode,
+                model_settings=chat_request.model_settings.model_dump() if chat_request.model_settings else None,
                 request=request
             ),
             media_type="text/event-stream",

@@ -8,29 +8,11 @@ from typing import Optional, Dict, List
 from pydantic import BaseModel, Field
 
 
-class ModelSettingsRequest(BaseModel):
-    """Model configuration settings for controlling LLM behavior"""
-    temperature: Optional[float] = Field(None, ge=0.0, le=2.0, description="Controls randomness (0=deterministic, 2=very creative)")
-    top_p: Optional[float] = Field(None, ge=0.0, le=1.0, description="Nucleus sampling threshold")
-    frequency_penalty: Optional[float] = Field(None, ge=-2.0, le=2.0, description="Penalty for token frequency (reduces repetition)")
-    presence_penalty: Optional[float] = Field(None, ge=-2.0, le=2.0, description="Penalty for token presence (encourages new topics)")
-    max_tokens: Optional[int] = Field(None, gt=0, description="Maximum number of output tokens")
-    verbosity: Optional[str] = Field(None, pattern="^(low|medium|high)$", description="Response verbosity level")
-    tool_choice: Optional[str] = Field(None, description="Tool selection strategy (auto, required, none, or specific tool name)")
-    parallel_tool_calls: Optional[bool] = Field(None, description="Allow multiple parallel tool calls")
-    truncation: Optional[str] = Field(None, pattern="^(auto|disabled)$", description="Context truncation strategy")
-    store: Optional[bool] = Field(None, description="Whether to store response for later retrieval")
-    include_usage: Optional[bool] = Field(None, description="Include usage information in response")
-    top_logprobs: Optional[int] = Field(None, ge=0, le=20, description="Number of top token log probabilities to return")
-    metadata: Optional[Dict[str, str]] = Field(None, description="Custom metadata key-value pairs")
-
-
 class ChatRequest(BaseModel):
     """Request model for chat endpoint (if using POST in future)"""
     message: str = Field(..., description="User message")
     session_id: str = Field(..., description="Session identifier")
     custom_instructions: Optional[str] = Field(None, description="Custom instructions override")
-    model_settings: Optional[ModelSettingsRequest] = Field(None, description="Optional model configuration settings")
 
 
 class SessionStatsResponse(BaseModel):

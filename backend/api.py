@@ -612,16 +612,26 @@ async def generate_chat_stream(
                         "content": message_content
                     }
                 ]
-                print(f"📎 [API] Message list created, starting streaming...", file=sys.stderr)
 
-                # Start streaming with message list
-                result = Runner.run_streamed(
-                    agent,
-                    message_list,
-                    previous_response_id=previous_response_id,
-                    run_config=run_config
-                )
-                print(f"✅ [API] Runner.run_streamed initiated successfully", file=sys.stderr)
+                # GPT-5 requires verified org for streaming, use non-streaming mode
+                if is_gpt5:
+                    print(f"💬 [API] GPT-5 detected - using non-streaming mode", file=sys.stderr)
+                    result = Runner.run(
+                        agent,
+                        message_list,
+                        previous_response_id=previous_response_id,
+                        run_config=run_config
+                    )
+                    print(f"✅ [API] Runner.run completed successfully", file=sys.stderr)
+                else:
+                    print(f"📎 [API] Message list created, starting streaming...", file=sys.stderr)
+                    result = Runner.run_streamed(
+                        agent,
+                        message_list,
+                        previous_response_id=previous_response_id,
+                        run_config=run_config
+                    )
+                    print(f"✅ [API] Runner.run_streamed initiated successfully", file=sys.stderr)
 
                 # Associate trace with session for tracing
                 if hasattr(result, 'trace_id'):
@@ -635,13 +645,24 @@ async def generate_chat_stream(
                 raise
         else:
             # Simple string message (backward compatible)
-            print(f"💬 [API] Sending text-only message", file=sys.stderr)
-            result = Runner.run_streamed(
-                agent,
-                actual_message,
-                previous_response_id=previous_response_id,
-                run_config=run_config
-            )
+            # GPT-5 requires verified org for streaming, use non-streaming mode
+            if is_gpt5:
+                print(f"💬 [API] GPT-5 detected - using non-streaming mode", file=sys.stderr)
+                result = Runner.run(
+                    agent,
+                    actual_message,
+                    previous_response_id=previous_response_id,
+                    run_config=run_config
+                )
+                print(f"✅ [API] Runner.run completed successfully", file=sys.stderr)
+            else:
+                print(f"💬 [API] Sending text-only message", file=sys.stderr)
+                result = Runner.run_streamed(
+                    agent,
+                    actual_message,
+                    previous_response_id=previous_response_id,
+                    run_config=run_config
+                )
 
             # Associate trace with session for tracing
             if hasattr(result, 'trace_id'):
@@ -655,31 +676,42 @@ async def generate_chat_stream(
         from datetime import datetime
         last_keepalive = datetime.now()
 
-        # Stream tokens as SSE events
-        async for event in result.stream_events():
-            # Check if client has disconnected (early termination)
-            if request and await request.is_disconnected():
-                print(f"🔌 [API] Client disconnected for session {session_id}, stopping stream", file=sys.stderr)
-                break
+        # Handle streaming vs non-streaming responses
+        if is_gpt5:
+            # GPT-5 non-streaming: Send complete response at once
+            print(f"📤 [API] Sending GPT-5 non-streaming response", file=sys.stderr)
+            # Get the complete response text
+            accumulated_response = result.text
 
-            # Send keepalive if no activity for 15 seconds
-            # This prevents fly.io proxy from closing idle connections
-            if (datetime.now() - last_keepalive).total_seconds() > 15:
-                yield f": keepalive\n\n"  # SSE comment (ignored by clients)
-                last_keepalive = datetime.now()
+            # Simulate streaming by yielding the complete response
+            # This maintains compatibility with frontend expecting SSE stream
+            yield f"data: {json.dumps(accumulated_response)}\n\n"
+        else:
+            # GPT-4 streaming: Send tokens as they arrive
+            async for event in result.stream_events():
+                # Check if client has disconnected (early termination)
+                if request and await request.is_disconnected():
+                    print(f"🔌 [API] Client disconnected for session {session_id}, stopping stream", file=sys.stderr)
+                    break
 
-            if (
-                event.type == "raw_response_event" and
-                isinstance(event.data, ResponseTextDeltaEvent)
-            ):
-                token = event.data.delta
-                accumulated_response += token
+                # Send keepalive if no activity for 15 seconds
+                # This prevents fly.io proxy from closing idle connections
+                if (datetime.now() - last_keepalive).total_seconds() > 15:
+                    yield f": keepalive\n\n"  # SSE comment (ignored by clients)
+                    last_keepalive = datetime.now()
 
-                # Send SSE event
-                yield f"data: {json.dumps(token)}\n\n"
+                if (
+                    event.type == "raw_response_event" and
+                    isinstance(event.data, ResponseTextDeltaEvent)
+                ):
+                    token = event.data.delta
+                    accumulated_response += token
 
-                # Reset keepalive timer on activity
-                last_keepalive = datetime.now()
+                    # Send SSE event
+                    yield f"data: {json.dumps(token)}\n\n"
+
+                    # Reset keepalive timer on activity
+                    last_keepalive = datetime.now()
 
         # Store conversation state
         if session_id not in conversation_state:

@@ -680,8 +680,8 @@ async def generate_chat_stream(
         if is_gpt5:
             # GPT-5 non-streaming: Send complete response at once
             print(f"📤 [API] Sending GPT-5 non-streaming response", file=sys.stderr)
-            # Get the complete response text
-            accumulated_response = result.text
+            # Get the complete response text from RunResult.final_output
+            accumulated_response = result.final_output
 
             # Simulate streaming by yielding the complete response
             # This maintains compatibility with frontend expecting SSE stream

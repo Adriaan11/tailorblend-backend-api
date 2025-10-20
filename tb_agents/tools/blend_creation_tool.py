@@ -217,6 +217,11 @@ async def create_personalized_blend(
         # Call production API
         print(f"🔧 [BLEND TOOL] Calling production API: {PRODUCTION_API_URL}", file=sys.stderr)
 
+        # Debug: Log the full request payload
+        import json
+        print(f"🔍 [BLEND TOOL] Request payload:", file=sys.stderr)
+        print(json.dumps(api_request, indent=2), file=sys.stderr)
+
         async with httpx.AsyncClient(timeout=30.0) as client:
             response = await client.post(
                 PRODUCTION_API_URL,
@@ -249,6 +254,15 @@ async def create_personalized_blend(
         # API call failed
         error_msg = f"API error: {str(e)}"
         print(f"❌ [BLEND TOOL] {error_msg}", file=sys.stderr)
+
+        # Try to extract response body for debugging
+        if hasattr(e, 'response') and e.response is not None:
+            try:
+                error_body = e.response.text
+                print(f"🔍 [BLEND TOOL] Error response body: {error_body}", file=sys.stderr)
+            except:
+                pass
+
         return BlendCreationResponse(
             success=False,
             errors=[error_msg],

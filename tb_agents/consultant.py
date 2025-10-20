@@ -46,7 +46,7 @@ presentation. Plain text responses are not acceptable.
 
 def create_tailorblend_consultant(
     custom_instructions: str = None,
-    model: str = "gpt-4.1-mini-2025-04-14",
+    model: str = "gpt-5",
     model_settings: ModelSettings = None
 ) -> Agent:
     """

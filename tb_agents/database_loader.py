@@ -62,6 +62,7 @@ def load_ingredients_database() -> str:
 
     for ing in ingredients:
         # Get fields with safe fallbacks for different JSON schema versions
+        ing_id = ing.get('ingredientId', 'N/A')
         name = ing.get('name', 'Unknown')
         min_range = ing.get('minimumRange', ing.get('minimumrange', 'N/A'))
         rec_range = ing.get('reccomendedRange', ing.get('reccomendedrange', 'N/A'))
@@ -70,7 +71,7 @@ def load_ingredients_database() -> str:
         cost = ing.get('pricePer30Servings', ing.get('priceper30servings', '0.00'))
         overview = ing.get('overview', '')
 
-        formatted_lines.append(f"• {name}")
+        formatted_lines.append(f"• {name} (ID: {ing_id})")
         formatted_lines.append(f"  Dosage Range: {min_range} - {rec_range} {unit} (Max: {max_range} {unit})")
         formatted_lines.append(f"  Cost: R{cost} per 30 servings")
         if overview:
@@ -138,14 +139,14 @@ def load_base_mixes_database() -> str:
 
     for base_id, base_info in sorted(base_mix_groups.items()):
         formatted_lines.append(f"\n{'*' * 80}")
-        formatted_lines.append(f"BASE MIX #{base_id}: {base_info['name']}")
+        formatted_lines.append(f"BASE MIX (ID: {base_id}): {base_info['name']}")
         formatted_lines.append(f"{'*' * 80}")
 
         for add_type, options in sorted(base_info['options'].items()):
             formatted_lines.append(f"\n  {add_type} Options:")
             for opt in options:
                 default_marker = " [DEFAULT]" if opt['default'] else ""
-                formatted_lines.append(f"    - ID {opt['id']}: {opt['name']}{default_marker}")
+                formatted_lines.append(f"    - Add-Mix ID {opt['id']}: {opt['name']}{default_marker}")
 
         formatted_lines.append("")  # Blank line between base mixes
 

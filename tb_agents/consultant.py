@@ -15,6 +15,7 @@ import sys
 from agents import Agent, ModelSettings
 from config.settings import load_instructions
 from tb_agents.database_loader import get_combined_database
+from tb_agents.tools import create_personalized_blend
 
 
 # Markdown formatting instruction for all agent responses
@@ -139,9 +140,11 @@ def create_tailorblend_consultant(
         # Model settings (for GPT-5: reasoning effort, verbosity, etc.)
         model_settings=model_settings if model_settings else ModelSettings(),
 
-        # No tools needed - all data is in the agent's context
-        # This simplifies the architecture and eliminates vector store dependency
-        tools=[],
+        # Function tools available to the agent
+        # - create_personalized_blend: Calls production API to create actual supplement blends
+        #   After consultation, the agent uses this to generate real products with pricing,
+        #   nutritional labels, and shareable URLs
+        tools=[create_personalized_blend],
 
         # No output_type specified = free-form conversation
         # Agent will naturally conclude when formulation is complete

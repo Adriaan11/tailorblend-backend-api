@@ -1,0 +1,41 @@
+meta {
+  name: Stream Chat (GET - Simple)
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/api/chat/stream?message=What supplements help with energy levels?&session_id={{session_id}}
+  body: none
+  auth: none
+}
+
+params:query {
+  message: What supplements help with energy levels?
+  session_id: {{session_id}}
+}
+
+docs {
+  # Stream Chat (GET - Text Only)
+
+  Simple streaming endpoint for text-only messages via Server-Sent Events (SSE).
+
+  **Use case**:
+  - Quick testing from browser/curl
+  - No file attachments needed
+  - Backward compatible
+
+  **Parameters**:
+  - `message` (required): The user's message
+  - `session_id` (required): Unique session identifier for conversation continuity
+
+  **Response Format** (SSE):
+  ```
+  data: "Hello"
+  data: " there"
+  data: "!"
+  data: [DONE]
+  ```
+
+  **Note**: Keep connection open to receive streaming tokens. Stream ends with `[DONE]`.
+}

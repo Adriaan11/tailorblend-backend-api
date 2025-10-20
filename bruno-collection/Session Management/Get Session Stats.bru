@@ -1,0 +1,47 @@
+meta {
+  name: Get Session Stats
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/api/session/stats?session_id={{session_id}}
+  body: none
+  auth: none
+}
+
+params:query {
+  session_id: {{session_id}}
+}
+
+docs {
+  # Get Session Stats
+
+  Retrieves token usage and cost statistics for a session.
+
+  **Use case**:
+  - Display real-time costs to user
+  - Track conversation length
+  - Monitor token consumption
+
+  **Response**:
+  ```json
+  {
+    "session_id": "test-session-abc123",
+    "model": "gpt-4.1-mini-2025-04-14",
+    "message_count": 8,
+    "total_input_tokens": 1250,
+    "total_output_tokens": 3800,
+    "total_tokens": 5050,
+    "cost_zar": 12.35,
+    "cost_formatted": "R12.35",
+    "last_usage": {
+      "input_tokens": 180,
+      "output_tokens": 420,
+      "total_tokens": 600
+    }
+  }
+  ```
+
+  **Note**: If session doesn't exist, returns zeros/null values.
+}

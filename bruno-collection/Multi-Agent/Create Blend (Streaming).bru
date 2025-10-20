@@ -1,0 +1,102 @@
+meta {
+  name: Create Blend (Streaming)
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{base_url}}/api/multi-agent/stream
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "session_id": "{{session_id}}",
+    "patient_profile": {
+      "age": 35,
+      "gender": "female",
+      "weight_kg": 65,
+      "height_cm": 165,
+      "activity_level": "moderate",
+      "health_goals": [
+        "Increase energy levels",
+        "Support immune system",
+        "Improve sleep quality"
+      ],
+      "dietary_preferences": "vegetarian",
+      "current_medications": [
+        "Birth control pill"
+      ],
+      "allergies": [],
+      "health_conditions": [
+        "Mild iron deficiency"
+      ],
+      "lifestyle_factors": {
+        "stress_level": "moderate",
+        "sleep_hours": 6.5,
+        "exercise_frequency": "3-4 times per week"
+      }
+    }
+  }
+}
+
+docs {
+  # Create Blend (Multi-Agent Streaming)
+
+  Advanced endpoint using multiple specialist agents to create personalized supplement blend.
+
+  **Use case**:
+  - Complex formulation requiring specialist knowledge
+  - Real-time progress tracking
+  - Clinical-grade recommendations
+
+  **Request Body**:
+  ```json
+  {
+    "session_id": "unique-id",
+    "patient_profile": {
+      "age": 35,
+      "gender": "female",
+      "weight_kg": 65,
+      "height_cm": 165,
+      "activity_level": "sedentary|light|moderate|active|very_active",
+      "health_goals": ["goal1", "goal2"],
+      "dietary_preferences": "omnivore|vegetarian|vegan",
+      "current_medications": ["med1"],
+      "allergies": ["allergy1"],
+      "health_conditions": ["condition1"],
+      "lifestyle_factors": {
+        "stress_level": "low|moderate|high",
+        "sleep_hours": 7.5,
+        "exercise_frequency": "description"
+      }
+    }
+  }
+  ```
+
+  **Agent Workflow**:
+  1. **Supplement Specialist**: Selects ingredients and dosages
+  2. **Formulation Specialist**: Configures base mix and delivery method
+
+  **Response Format** (SSE):
+  ```
+  data: {"agent_name": "SupplementSpecialist", "step_type": "analysis", "content": "Analyzing health goals..."}
+
+  data: {"agent_name": "SupplementSpecialist", "step_type": "recommendation", "data": {"ingredients": [...]}}
+
+  data: {"agent_name": "FormulationSpecialist", "step_type": "analysis", "content": "Configuring base mix..."}
+
+  data: {"agent_name": "FormulationSpecialist", "step_type": "final_blend", "data": {"blend": {...}}}
+
+  data: [DONE]
+  ```
+
+  **Step Types**:
+  - `analysis`: Agent is analyzing data
+  - `recommendation`: Agent has made a decision
+  - `final_blend`: Complete formulation ready
+  - `error`: Something went wrong
+
+  **Note**: Keep connection open to receive all agent steps.
+}

@@ -1,0 +1,49 @@
+meta {
+  name: Reset Session
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/api/session/reset
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "session_id": "{{session_id}}"
+  }
+}
+
+docs {
+  # Reset Session
+
+  Clears conversation history and statistics for a session.
+
+  **Use case**:
+  - Start fresh conversation with same session ID
+  - Clear context when changing topics
+  - Reset token counters
+
+  **What Gets Cleared**:
+  - Conversation history (`previous_response_id`)
+  - Message count
+  - Token counters (input, output, total)
+  - Trace data
+  - Cost accumulation
+
+  **What Persists**:
+  - Session ID remains valid
+  - Model selection
+
+  **Response**:
+  ```json
+  {
+    "status": "session reset",
+    "session_id": "test-session-abc123"
+  }
+  ```
+
+  **Note**: Safe to call even if session doesn't exist.
+}

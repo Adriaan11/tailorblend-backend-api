@@ -1,0 +1,37 @@
+meta {
+  name: Reset Instructions
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{base_url}}/api/instructions/reset
+  body: none
+  auth: none
+}
+
+docs {
+  # Reset Instructions
+
+  Resets instructions back to defaults from `spec/instructions.txt`.
+
+  **Use case**:
+  - Revert experimental prompt changes
+  - Clear custom instructions
+  - Return to known-good state
+
+  **Response**:
+  ```json
+  {
+    "status": "instructions reset to default",
+    "source": "default"
+  }
+  ```
+
+  **What Happens**:
+  1. Clears custom instructions cache
+  2. Reloads from `spec/instructions.txt`
+  3. Future chat requests use default prompt
+
+  **Note**: Doesn't affect existing conversations (only new agent instances).
+}

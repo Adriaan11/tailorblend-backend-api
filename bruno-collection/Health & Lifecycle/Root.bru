@@ -1,0 +1,19 @@
+meta {
+  name: Root
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/
+  body: none
+  auth: none
+}
+
+docs {
+  # Root Endpoint
+
+  Basic connectivity check. Returns a simple welcome message.
+
+  **Use case**: Verify the API is reachable and responding.
+}

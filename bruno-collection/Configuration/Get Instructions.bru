@@ -1,0 +1,36 @@
+meta {
+  name: Get Instructions
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{base_url}}/api/instructions
+  body: none
+  auth: none
+}
+
+docs {
+  # Get Instructions
+
+  Retrieves the current system instructions (prompt) used by the agent.
+
+  **Use case**:
+  - View active behavior guidelines
+  - Audit current configuration
+  - Export for documentation
+
+  **Response**:
+  ```json
+  {
+    "instructions": "You are a TailorBlend AI Supplement Consultant...\n\n[Full system prompt here]",
+    "source": "custom"  // or "default"
+  }
+  ```
+
+  **Sources**:
+  - `default`: Loaded from `spec/instructions.txt` at startup
+  - `custom`: Runtime override via POST /api/instructions (in-memory only)
+
+  **Note**: Custom instructions reset when API restarts.
+}

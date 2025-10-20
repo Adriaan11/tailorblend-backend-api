@@ -1,0 +1,56 @@
+meta {
+  name: Chat (Non-Streaming)
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{base_url}}/api/chat
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "message": "What are the benefits of Vitamin D3?",
+    "session_id": "{{session_id}}",
+    "model": "gpt-4.1-mini-2025-04-14",
+    "custom_instructions": "",
+    "practitioner_mode": false,
+    "attachments": []
+  }
+}
+
+docs {
+  # Chat (Non-Streaming)
+
+  Complete response returned at once (no streaming).
+
+  **Use case**:
+  - When you need the full response immediately
+  - Simpler client implementation (no SSE handling)
+  - Used by Blazor frontend (simulates streaming client-side)
+
+  **Request Body**: Same as streaming POST endpoint
+
+  **Response**:
+  ```json
+  {
+    "response": "Complete assistant message here...",
+    "session_id": "your-session-id",
+    "tokens": {
+      "input_tokens": 150,
+      "output_tokens": 350,
+      "total_tokens": 500
+    },
+    "cost_zar": 2.45,
+    "model": "gpt-4.1-mini-2025-04-14",
+    "message_count": 5
+  }
+  ```
+
+  **Cost Calculation**:
+  - Input: 150 tokens × $0.40/1M × 17.50 ZAR/USD = R0.00105
+  - Output: 350 tokens × $1.60/1M × 17.50 ZAR/USD = R0.0098
+  - Total: R0.01085 ≈ R0.01
+}

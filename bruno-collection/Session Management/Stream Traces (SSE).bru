@@ -1,0 +1,37 @@
+meta {
+  name: Stream Traces (SSE)
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{base_url}}/api/session/{{session_id}}/traces/stream
+  body: none
+  auth: none
+}
+
+docs {
+  # Stream Traces (SSE)
+
+  Real-time trace streaming via Server-Sent Events.
+
+  **Use case**:
+  - Live debugging dashboard
+  - Real-time performance monitoring
+  - Watch agent execution as it happens
+
+  **Response Format** (SSE):
+  ```
+  data: {"trace_id": "abc", "span_id": "123", "event": "start", ...}
+
+  data: {"trace_id": "abc", "span_id": "123", "event": "end", "duration_ms": 450.2}
+  ```
+
+  **Event Types**:
+  - `start`: Span/operation started
+  - `end`: Span/operation completed
+  - `error`: Error occurred
+  - `metadata`: Additional context
+
+  **Connection**: Keep-alive, reconnects automatically on disconnect.
+}

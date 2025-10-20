@@ -1,0 +1,24 @@
+meta {
+  name: Health Check
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{base_url}}/health
+  body: none
+  auth: none
+}
+
+docs {
+  # Health Check (Liveness Probe)
+
+  Ultra-fast liveness probe that always returns 200 OK immediately.
+
+  **Use case**:
+  - Kubernetes/Railway/fly.io health checks
+  - Load balancer health monitoring
+  - Does NOT wait for initialization (use /api/ready for that)
+
+  **Response**: `{"status": "ok"}`
+}

@@ -1,0 +1,26 @@
+meta {
+  name: Readiness Check
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{base_url}}/api/ready
+  body: none
+  auth: none
+}
+
+docs {
+  # Readiness Check
+
+  Returns 200 when the API is fully initialized and ready to serve requests.
+  Returns 503 during startup/initialization.
+
+  **Use case**:
+  - Wait for heavy OpenAI SDK initialization to complete
+  - Ensure agents are loaded before routing traffic
+
+  **Responses**:
+  - `200`: `{"status": "ready"}`
+  - `503`: `{"status": "not ready", "detail": "Application is still initializing"}`
+}

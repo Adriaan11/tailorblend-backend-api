@@ -1,0 +1,41 @@
+meta {
+  name: Get Traces
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{base_url}}/api/session/{{session_id}}/traces
+  body: none
+  auth: none
+}
+
+docs {
+  # Get Traces
+
+  Retrieves execution traces for debugging and monitoring.
+
+  **Use case**:
+  - Debug agent execution flow
+  - Monitor performance metrics
+  - Analyze decision-making process
+
+  **Response**:
+  ```json
+  [
+    {
+      "trace_id": "trace-abc123",
+      "span_id": "span-456",
+      "duration_ms": 1250.5,
+      "metadata": {
+        "model": "gpt-4.1-mini-2025-04-14",
+        "tokens": 350,
+        "step": "supplement_selection"
+      },
+      "timestamp": "2025-01-15T10:30:45Z"
+    }
+  ]
+  ```
+
+  **Note**: Traces stored in circular buffer (max 10 per session).
+}

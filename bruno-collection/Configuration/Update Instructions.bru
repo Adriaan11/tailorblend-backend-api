@@ -1,0 +1,50 @@
+meta {
+  name: Update Instructions
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/api/instructions
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "instructions": "You are a TailorBlend AI Supplement Consultant.\n\nBe extremely concise and direct. Focus on science-backed recommendations only."
+  }
+}
+
+docs {
+  # Update Instructions
+
+  Updates system instructions at runtime (in-memory only).
+
+  **Use case**:
+  - A/B test different prompts
+  - Temporary behavior changes
+  - Development/testing
+
+  **Request Body**:
+  ```json
+  {
+    "instructions": "Your new system prompt here..."
+  }
+  ```
+
+  **Response**:
+  ```json
+  {
+    "status": "instructions updated",
+    "source": "custom"
+  }
+  ```
+
+  **Important**:
+  - Changes are **in-memory only** (not persisted to disk)
+  - Resets when API restarts
+  - For permanent changes, edit `spec/instructions.txt` and redeploy
+
+  **Security**: No authentication required (consider adding in production).
+}

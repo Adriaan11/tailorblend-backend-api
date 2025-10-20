@@ -1,0 +1,146 @@
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+docs {
+  # TailorBlend Backend API Collection
+
+  Complete Bruno/Insomnium collection for the TailorBlend AI supplement consultation backend.
+
+  ## Quick Start
+
+  1. **Select Environment**: Choose "Local" or "Production" in Bruno/Insomnium
+  2. **Test Health**: Run "Health & Lifecycle > Health Check"
+  3. **Start Chatting**: Run "Chat > Stream Chat (GET - Simple)"
+  4. **View Stats**: Run "Session Management > Get Session Stats"
+
+  ## Environment Variables
+
+  The collection uses these variables (configured in environment files):
+
+  - `base_url`: API base URL (http://localhost:5000 or https://tailorblend-backend-api.fly.dev)
+  - `session_id`: Auto-generated session ID using `{{$randomUUID}}`
+
+  ## Available Models
+
+  - `gpt-4.1-mini-2025-04-14` (default): Balanced quality/cost
+  - `gpt-5-mini-2025-08-07`: Latest GPT-5 mini
+  - `gpt-5-nano-2025-08-07`: Ultra-fast, lowest cost
+  - `gpt-5-chat-latest`: Highest quality, premium cost
+
+  ## Endpoint Categories
+
+  ### Health & Lifecycle
+  - Basic connectivity and readiness checks
+  - Use for monitoring and load balancer health probes
+
+  ### Chat
+  - Simple GET streaming (text-only)
+  - Advanced POST streaming (with file attachments)
+  - Non-streaming (complete response)
+
+  ### Session Management
+  - Token usage and cost tracking
+  - Conversation reset
+  - Trace retrieval and streaming
+
+  ### Configuration
+  - View/update/reset system instructions
+  - Runtime prompt customization
+
+  ### Multi-Agent
+  - Advanced blend formulation
+  - Multiple specialist agents working together
+  - Real-time progress streaming
+
+  ## SSE Streaming Notes
+
+  Bruno/Insomnium may not display SSE streams perfectly. For better SSE testing:
+
+  ```bash
+  # Using curl
+  curl -N "http://localhost:5000/api/chat/stream?message=Hello&session_id=test123"
+
+  # Using httpie
+  http --stream GET "http://localhost:5000/api/chat/stream" message=="Hello" session_id=="test123"
+  ```
+
+  ## Cost Tracking
+
+  All responses include ZAR (South African Rand) costs calculated at 17.50 ZAR/USD:
+
+  - Input tokens: Model-specific rate × token count × 17.50
+  - Output tokens: Model-specific rate × token count × 17.50
+  - Total: Sum of input + output costs
+
+  ## Common Workflows
+
+  ### 1. Basic Chat Session
+  ```
+  1. Health Check → Verify API is running
+  2. Stream Chat (GET) → Send first message
+  3. Get Session Stats → View token usage
+  4. Stream Chat (GET) → Continue conversation
+  5. Get Session Stats → Updated usage
+  6. Reset Session → Clear when done
+  ```
+
+  ### 2. Advanced Blend Creation
+  ```
+  1. Health Check → Verify API is running
+  2. Create Blend (Streaming) → Submit patient profile
+  3. [Watch agent progress in real-time]
+  4. Get Session Stats → View total cost
+  ```
+
+  ### 3. Instruction Testing
+  ```
+  1. Get Instructions → View current prompt
+  2. Update Instructions → Test new prompt
+  3. Chat (Non-Streaming) → Test behavior
+  4. Reset Instructions → Revert to default
+  ```
+
+  ## Authentication
+
+  Currently **no authentication** required. Consider adding for production use:
+  - API key in header: `X-API-Key: your-key`
+  - Bearer token: `Authorization: Bearer token`
+  - OAuth 2.0 for user-specific sessions
+
+  ## Rate Limiting
+
+  No rate limiting currently implemented. Recommended for production:
+  - Per-session: 20 requests/minute
+  - Per-IP: 100 requests/minute
+  - Cost limits: R50/session/day
+
+  ## Error Responses
+
+  All errors return JSON:
+
+  ```json
+  {
+    "detail": "Error message here",
+    "status_code": 400,
+    "error_type": "validation_error"
+  }
+  ```
+
+  Common status codes:
+  - `400`: Bad request (invalid parameters)
+  - `503`: Service unavailable (still initializing)
+  - `500`: Internal server error
+
+  ## Support
+
+  - Documentation: See backend/CLAUDE.md
+  - Issues: Check application logs
+  - Health: Always start with /health endpoint
+
+  ---
+
+  **Version**: 1.0.0
+  **Last Updated**: 2025-01-19
+}

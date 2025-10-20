@@ -1,0 +1,73 @@
+meta {
+  name: Stream Chat (POST - With Attachments)
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}/api/chat/stream
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "message": "Can you analyze this blood test report?",
+    "session_id": "{{session_id}}",
+    "model": "gpt-4.1-mini-2025-04-14",
+    "custom_instructions": "",
+    "practitioner_mode": false,
+    "attachments": [
+      {
+        "filename": "blood_test.pdf",
+        "base64_data": "JVBERi0xLjQKJeLjz9MKM...",
+        "mime_type": "application/pdf",
+        "file_size": 45678
+      }
+    ]
+  }
+}
+
+docs {
+  # Stream Chat (POST - With Attachments)
+
+  Advanced streaming endpoint supporting file attachments via Server-Sent Events (SSE).
+
+  **Use case**:
+  - Upload images, PDFs, or documents for analysis
+  - Configure model and custom instructions
+  - Enable practitioner mode for clinical analysis
+
+  **Request Body**:
+  ```json
+  {
+    "message": "Your message",
+    "session_id": "unique-id",
+    "model": "gpt-4.1-mini-2025-04-14",  // Optional
+    "custom_instructions": "Be concise",   // Optional
+    "practitioner_mode": false,            // Optional
+    "attachments": [                       // Optional
+      {
+        "filename": "file.pdf",
+        "base64_data": "base64...",
+        "mime_type": "application/pdf",
+        "file_size": 12345
+      }
+    ]
+  }
+  ```
+
+  **Supported File Types**:
+  - Images: `image/png`, `image/jpeg`, `image/webp`, `image/gif`
+  - Documents: `application/pdf`, `text/plain`, etc.
+
+  **Response Format** (SSE):
+  ```
+  data: "Token"
+  data: " by"
+  data: " token"
+  data: [DONE]
+  ```
+
+  **Note**: For actual file uploads, replace `base64_data` with real Base64-encoded content.
+}

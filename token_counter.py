@@ -15,6 +15,7 @@ USD_TO_ZAR = 17.50  # Exchange rate (October 2025)
 # Based on OpenAI API pricing as of August-October 2025
 MODEL_PRICING = {
     "gpt-4.1-mini-2025-04-14": {"input": 0.40, "output": 1.60},
+    "gpt-5-2025-08-07": {"input": 2.50, "output": 10.00},  # GPT-5 full model
     "gpt-5-mini-2025-08-07": {"input": 0.25, "output": 2.00},
     "gpt-5-nano-2025-08-07": {"input": 0.05, "output": 0.40},
     "gpt-5-chat-latest": {"input": 1.25, "output": 10.00},
@@ -71,6 +72,7 @@ def calculate_cost_zar(input_tokens: int, output_tokens: int = 0, model: str = "
 
     Supports multiple models with different pricing:
     - GPT-4.1-mini: $0.40 input / $1.60 output per 1M tokens
+    - GPT-5: $2.50 input / $10.00 output per 1M tokens (most capable)
     - GPT-5-mini: $0.25 input / $2.00 output per 1M tokens
     - GPT-5-nano: $0.05 input / $0.40 output per 1M tokens
     - GPT-5-chat: $1.25 input / $10.00 output per 1M tokens

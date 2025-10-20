@@ -37,10 +37,11 @@ def create_tailorblend_consultant(custom_instructions: str = None, model: str = 
                             If None, loads from spec/instructions.txt
         model: OpenAI model to use. Defaults to "gpt-4.1-mini-2025-04-14".
                Supported models:
+               - gpt-4.1-mini-2025-04-14 (default, fast and cost-effective)
+               - gpt-5-2025-08-07 (most capable)
                - gpt-5-mini-2025-08-07
                - gpt-5-nano-2025-08-07
                - gpt-5-chat-latest
-               - gpt-4.1-mini-2025-04-14 (default)
 
     Returns:
         Agent: Configured TailorBlend consultant agent

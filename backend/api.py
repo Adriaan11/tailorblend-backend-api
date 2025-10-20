@@ -85,9 +85,10 @@ except Exception as e:
     raise
 
 try:
-    logger.debug("→ Importing agents.Runner, RunConfig")
-    from agents import Runner, RunConfig
-    logger.debug("✅ agents.Runner, RunConfig imported")
+    logger.debug("→ Importing agents.Runner, RunConfig, ModelSettings")
+    from agents import Runner, RunConfig, ModelSettings
+    from openai.types.shared import Reasoning
+    logger.debug("✅ agents.Runner, RunConfig, ModelSettings imported")
 except Exception as e:
     logger.error(f"❌ Failed to import agents modules: {e}", exc_info=True)
     raise
@@ -166,6 +167,8 @@ class ChatRequest(BaseModel):
     model: str = Field("gpt-4.1-mini-2025-04-14", description="OpenAI model to use")
     attachments: List[FileAttachment] = Field(default_factory=list, description="File attachments")
     practitioner_mode: bool = Field(False, description="Use practitioner-specific instructions")
+    reasoning_effort: Optional[str] = Field("minimal", description="Reasoning effort for GPT-5 models (minimal/low/medium/high)")
+    verbosity: Optional[str] = Field("medium", description="Response verbosity for GPT-5 models (low/medium/high)")
 
 
 class TokenInfo(BaseModel):
@@ -512,6 +515,8 @@ async def generate_chat_stream(
     model: str = "gpt-4.1-mini-2025-04-14",
     attachments: List[FileAttachment] = [],
     practitioner_mode: bool = False,
+    reasoning_effort: Optional[str] = "minimal",
+    verbosity: Optional[str] = "medium",
     request: Optional[Request] = None
 ):
     """
@@ -548,10 +553,26 @@ async def generate_chat_stream(
             print(f"✨ [API] Using explicit custom instructions for chat ({len(instructions_to_use)} chars)", file=sys.stderr)
 
         # Create agent with custom instructions and selected model
-        agent = create_tailorblend_consultant(
-            custom_instructions=instructions_to_use,
-            model=model
-        )
+        # For GPT-5 models, add reasoning and verbosity settings
+        is_gpt5 = model.startswith("gpt-5")
+
+        if is_gpt5:
+            print(f"🧠 [API] GPT-5 detected - using reasoning={reasoning_effort}, verbosity={verbosity}", file=sys.stderr)
+            model_settings = ModelSettings(
+                reasoning=Reasoning(effort=reasoning_effort),
+                verbosity=verbosity
+            )
+            agent = create_tailorblend_consultant(
+                custom_instructions=instructions_to_use,
+                model=model,
+                model_settings=model_settings
+            )
+        else:
+            # GPT-4.x models - no special settings needed
+            agent = create_tailorblend_consultant(
+                custom_instructions=instructions_to_use,
+                model=model
+            )
 
         # Create RunConfig
         run_config = RunConfig(workflow_name="TailorBlend Consultation")
@@ -772,6 +793,8 @@ async def chat_post(chat_request: ChatRequest, request: Request):
                     chat_request.model,
                     chat_request.attachments,
                     chat_request.practitioner_mode,
+                    chat_request.reasoning_effort,
+                    chat_request.verbosity,
                     request=request
                 ):
                     chunk_count += 1
@@ -927,6 +950,8 @@ async def stream_chat_post(chat_request: ChatRequest, request: Request):
                 chat_request.model,
                 chat_request.attachments,
                 chat_request.practitioner_mode,
+                chat_request.reasoning_effort,
+                chat_request.verbosity,
                 request=request
             ),
             media_type="text/event-stream",

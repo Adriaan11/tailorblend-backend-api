@@ -15,9 +15,9 @@ USD_TO_ZAR = 17.50  # Exchange rate (October 2025)
 # Based on OpenAI API pricing as of August-October 2025
 MODEL_PRICING = {
     "gpt-4.1-mini-2025-04-14": {"input": 0.40, "output": 1.60},
-    "gpt-5-2025-08-07": {"input": 2.50, "output": 10.00},  # GPT-5 full model
-    "gpt-5-mini-2025-08-07": {"input": 0.25, "output": 2.00},
-    "gpt-5-nano-2025-08-07": {"input": 0.05, "output": 0.40},
+    "gpt-5": {"input": 2.50, "output": 10.00},  # GPT-5 full reasoning model
+    "gpt-5-mini": {"input": 0.25, "output": 2.00},
+    "gpt-5-nano": {"input": 0.05, "output": 0.40},
     "gpt-5-chat-latest": {"input": 1.25, "output": 10.00},
 }
 

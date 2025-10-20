@@ -11,12 +11,16 @@ This agent:
 4. Provides expert recommendations with reasoning
 """
 
-from agents import Agent
+from agents import Agent, ModelSettings
 from config.settings import load_instructions
 from tb_agents.database_loader import get_combined_database
 
 
-def create_tailorblend_consultant(custom_instructions: str = None, model: str = "gpt-4.1-mini-2025-04-14") -> Agent:
+def create_tailorblend_consultant(
+    custom_instructions: str = None,
+    model: str = "gpt-4.1-mini-2025-04-14",
+    model_settings: ModelSettings = None
+) -> Agent:
     """
     Create the main TailorBlend consultant agent.
 
@@ -90,6 +94,9 @@ def create_tailorblend_consultant(custom_instructions: str = None, model: str = 
         # Use specified model (defaults to GPT-4.1 mini)
         # Model can be changed via API parameter for different performance/cost tradeoffs
         model=model,
+
+        # Model settings (for GPT-5: reasoning effort, verbosity, etc.)
+        model_settings=model_settings if model_settings else ModelSettings(),
 
         # No tools needed - all data is in the agent's context
         # This simplifies the architecture and eliminates vector store dependency

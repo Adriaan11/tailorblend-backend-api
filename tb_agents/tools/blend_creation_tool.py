@@ -11,7 +11,7 @@ product details including URL, pricing, and nutritional information.
 import uuid
 import sys
 from datetime import datetime, timezone
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Any
 import httpx
 from agents import function_tool
 
@@ -68,9 +68,9 @@ async def create_personalized_blend(
     add_mix_ids: List[int] = None,
 
     # Active Ingredients (with IDs and amounts)
-    ingredients: List[Dict[str, any]] = None,
+    ingredients: List[Dict[str, Any]] = None,
 
-) -> Dict[str, any]:
+) -> Dict[str, Any]:
     """
     Create a personalized supplement blend in the TailorBlend production system.
 

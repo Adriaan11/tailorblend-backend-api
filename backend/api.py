@@ -616,7 +616,7 @@ async def generate_chat_stream(
                 # GPT-5 requires verified org for streaming, use non-streaming mode
                 if is_gpt5:
                     print(f"💬 [API] GPT-5 detected - using non-streaming mode", file=sys.stderr)
-                    result = Runner.run(
+                    result = await Runner.run(
                         agent,
                         message_list,
                         previous_response_id=previous_response_id,
@@ -648,7 +648,7 @@ async def generate_chat_stream(
             # GPT-5 requires verified org for streaming, use non-streaming mode
             if is_gpt5:
                 print(f"💬 [API] GPT-5 detected - using non-streaming mode", file=sys.stderr)
-                result = Runner.run(
+                result = await Runner.run(
                     agent,
                     actual_message,
                     previous_response_id=previous_response_id,

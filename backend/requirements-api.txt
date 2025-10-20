@@ -27,3 +27,7 @@ requests>=2.31.0
 # Pydantic
 # Data validation and serialization (included with FastAPI but explicit here)
 pydantic>=2.0.0
+
+# Async file I/O
+# For async file operations to avoid blocking the event loop
+aiofiles>=23.0.0

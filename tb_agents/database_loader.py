@@ -13,6 +13,7 @@ This module provides:
 import json
 from pathlib import Path
 from typing import Optional
+import aiofiles
 
 # Module-level cache (loaded once at import time)
 _CACHED_INGREDIENTS: Optional[str] = None
@@ -25,7 +26,7 @@ def _get_spec_path(filename: str) -> Path:
     return project_root / "spec" / filename
 
 
-def load_ingredients_database() -> str:
+async def load_ingredients_database() -> str:
     """
     Load and format the ingredients database (Ingredients3.json).
 
@@ -49,8 +50,9 @@ def load_ingredients_database() -> str:
     # Load and format
     ingredients_file = _get_spec_path("Ingredients3.json")
 
-    with open(ingredients_file, 'r', encoding='utf-8') as f:
-        ingredients = json.load(f)
+    async with aiofiles.open(ingredients_file, 'r', encoding='utf-8') as f:
+        content = await f.read()
+        ingredients = json.loads(content)
 
     # Format ingredients as readable text for agent
     formatted_lines = [
@@ -82,7 +84,7 @@ def load_ingredients_database() -> str:
     return _CACHED_INGREDIENTS
 
 
-def load_base_mixes_database() -> str:
+async def load_base_mixes_database() -> str:
     """
     Load and format the base mixes database (BaseAddMixes2.json).
 
@@ -105,8 +107,9 @@ def load_base_mixes_database() -> str:
     # Load and format
     base_mixes_file = _get_spec_path("BaseAddMixes2.json")
 
-    with open(base_mixes_file, 'r', encoding='utf-8') as f:
-        base_mixes = json.load(f)
+    async with aiofiles.open(base_mixes_file, 'r', encoding='utf-8') as f:
+        content = await f.read()
+        base_mixes = json.loads(content)
 
     # Group by baseMixId for clearer presentation
     base_mix_groups = {}
@@ -154,7 +157,7 @@ def load_base_mixes_database() -> str:
     return _CACHED_BASE_MIXES
 
 
-def get_combined_database() -> str:
+async def get_combined_database() -> str:
     """
     Get both ingredients and base mixes databases combined.
 
@@ -164,8 +167,8 @@ def get_combined_database() -> str:
     Returns:
         str: Complete formatted database (ingredients + base mixes)
     """
-    ingredients = load_ingredients_database()
-    base_mixes = load_base_mixes_database()
+    ingredients = await load_ingredients_database()
+    base_mixes = await load_base_mixes_database()
 
     return f"{ingredients}\n{base_mixes}"
 

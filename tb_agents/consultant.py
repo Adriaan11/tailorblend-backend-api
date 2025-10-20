@@ -44,7 +44,7 @@ presentation. Plain text responses are not acceptable.
 """
 
 
-def create_tailorblend_consultant(
+async def create_tailorblend_consultant(
     custom_instructions: str = None,
     model: str = "gpt-5",
     model_settings: ModelSettings = None
@@ -104,12 +104,12 @@ def create_tailorblend_consultant(
     else:
         # Load full instructions from spec/instructions.txt
         # This is the "system prompt" containing all business logic
-        instructions = load_instructions()
+        instructions = await load_instructions()
 
     # Load complete database into agent memory
     # This gives the agent instant access to all ingredients and base mixes
     # without needing to query an external vector store
-    database_context = get_combined_database()
+    database_context = await get_combined_database()
 
     # Smart detection: Only append markdown formatting if not already mentioned
     # This prevents duplication if custom_instructions already specify markdown

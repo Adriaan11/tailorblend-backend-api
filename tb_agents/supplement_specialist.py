@@ -13,7 +13,7 @@ from backend.models import SupplementRecommendation
 from tb_agents.database_loader import load_ingredients_database
 
 
-def create_supplement_specialist() -> Agent:
+async def create_supplement_specialist() -> Agent:
     """
     Create the Supplement Specialist agent.
 
@@ -30,7 +30,7 @@ def create_supplement_specialist() -> Agent:
 
     # Load all ingredients into agent context from shared loader
     # This uses module-level caching for performance
-    ingredients_data = load_ingredients_database()
+    ingredients_data = await load_ingredients_database()
 
     instructions = f"""You are a clinical supplement specialist with expertise in personalized nutrition.
 

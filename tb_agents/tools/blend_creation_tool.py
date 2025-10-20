@@ -14,6 +14,7 @@ from datetime import datetime, timezone
 from typing import List, Dict, Optional, Any
 import httpx
 from agents import function_tool
+from pydantic import BaseModel, Field
 
 # Import base mix type ID mappings
 from config.base_mix_mappings import get_base_mix_info
@@ -37,6 +38,44 @@ TEMPLATE_ID = "31"
 DEFAULT_NUMBER_OF_SERVINGS = 30
 DEFAULT_SENDER_ACCOUNT = "orders.tailorblend.co.za"
 DEFAULT_REFERRER = "AI_CONSULTANT"
+
+
+# ============================================================================
+# PYDANTIC MODELS FOR STRICT SCHEMA VALIDATION
+# ============================================================================
+
+class IngredientInput(BaseModel):
+    """Input model for ingredient specification"""
+    ingredientId: int = Field(..., description="Database ingredient ID")
+    name: str = Field(..., description="Ingredient name")
+    amount: float = Field(..., description="Amount in mg or g")
+    description: str = Field(default="", description="Brief benefit description")
+
+
+class NutritionalInfo(BaseModel):
+    """Nutritional information per serving"""
+    calories: int = Field(default=0)
+    protein: float = Field(default=0.0)
+    carbohydrates: float = Field(default=0.0)
+    fats: float = Field(default=0.0)
+    fiber: float = Field(default=0.0)
+    energy: float = Field(default=0.0)
+
+
+class BlendCreationResponse(BaseModel):
+    """Response from blend creation API"""
+    success: bool
+    errors: List[str] = Field(default_factory=list)
+    blend_url: str = Field(default="")
+    product_image_url: str = Field(default="")
+    nutritional_label_url: str = Field(default="")
+    blend_name: str
+    price: float = Field(default=0.0)
+    servings: int = Field(default=0)
+    base_mix: str = Field(default="")
+    nutritional_info: NutritionalInfo = Field(default_factory=NutritionalInfo)
+    ingredients: List[dict] = Field(default_factory=list)  # Keep as dict - comes from API
+    add_mixes: List[dict] = Field(default_factory=list)    # Keep as dict - comes from API
 
 
 # ============================================================================
@@ -65,12 +104,12 @@ async def create_personalized_blend(
     number_of_servings: int = DEFAULT_NUMBER_OF_SERVINGS,
 
     # Add-Mixes (flavors, sweeteners, thickness, etc.)
-    add_mix_ids: List[int] = None,
+    add_mix_ids: Optional[List[int]] = None,
 
     # Active Ingredients (with IDs and amounts)
-    ingredients: List[Dict[str, Any]] = None,
+    ingredients: Optional[List[IngredientInput]] = None,
 
-) -> Dict[str, Any]:
+) -> BlendCreationResponse:
     """
     Create a personalized supplement blend in the TailorBlend production system.
 
@@ -103,10 +142,10 @@ async def create_personalized_blend(
         add_mix_ids: List of add-mix IDs (flavors, sweeteners, etc.) from database
             Example: [38, 58] = Passion Fruit flavor + Xylitol sweetener
 
-        ingredients: List of ingredient dictionaries with required fields:
+        ingredients: List of IngredientInput models with required fields:
             Example: [
-                {"ingredientId": 2, "name": "ALPHA LIPOIC ACID", "amount": 35.0, "description": "..."},
-                {"ingredientId": 5, "name": "BETA ALANINE", "amount": 1.0, "description": "..."}
+                IngredientInput(ingredientId=2, name="ALPHA LIPOIC ACID", amount=35.0, description="Antioxidant"),
+                IngredientInput(ingredientId=5, name="BETA ALANINE", amount=1.0, description="Endurance")
             ]
             - ingredientId (int): ID from database
             - name (str): Ingredient name
@@ -114,14 +153,14 @@ async def create_personalized_blend(
             - description (str): Brief description or benefit
 
     Returns:
-        Dictionary containing:
+        BlendCreationResponse containing:
         - success (bool): Whether blend was created successfully
         - blend_url (str): URL to view/purchase the blend
         - blend_name (str): Final blend name
         - price (float): Price in ZAR
         - servings (int): Number of servings
-        - nutritional_info (dict): Calories, protein, carbs, fats, etc.
-        - errors (list): Any error messages (empty if successful)
+        - nutritional_info (NutritionalInfo): Calories, protein, carbs, fats, etc.
+        - errors (List[str]): Any error messages (empty if successful)
 
     Raises:
         ValueError: If base_mix_id is invalid
@@ -140,8 +179,8 @@ async def create_personalized_blend(
             base_mix_id=2,  # Drink
             add_mix_ids=[38, 58],  # Passion fruit + Xylitol
             ingredients=[
-                {"ingredientId": 2, "name": "ALPHA LIPOIC ACID", "amount": 35.0, "description": "Antioxidant"},
-                {"ingredientId": 5, "name": "BETA ALANINE", "amount": 1.0, "description": "Endurance"}
+                IngredientInput(ingredientId=2, name="ALPHA LIPOIC ACID", amount=35.0, description="Antioxidant"),
+                IngredientInput(ingredientId=5, name="BETA ALANINE", amount=1.0, description="Endurance")
             ]
         )
     """
@@ -200,43 +239,31 @@ async def create_personalized_blend(
         # Invalid base_mix_id or other validation error
         error_msg = f"Validation error: {str(e)}"
         print(f"❌ [BLEND TOOL] {error_msg}", file=sys.stderr)
-        return {
-            "success": False,
-            "errors": [error_msg],
-            "blend_url": None,
-            "blend_name": blend_name,
-            "price": 0.0,
-            "servings": 0,
-            "nutritional_info": {}
-        }
+        return BlendCreationResponse(
+            success=False,
+            errors=[error_msg],
+            blend_name=blend_name
+        )
 
     except httpx.HTTPError as e:
         # API call failed
         error_msg = f"API error: {str(e)}"
         print(f"❌ [BLEND TOOL] {error_msg}", file=sys.stderr)
-        return {
-            "success": False,
-            "errors": [error_msg],
-            "blend_url": None,
-            "blend_name": blend_name,
-            "price": 0.0,
-            "servings": 0,
-            "nutritional_info": {}
-        }
+        return BlendCreationResponse(
+            success=False,
+            errors=[error_msg],
+            blend_name=blend_name
+        )
 
     except Exception as e:
         # Unexpected error
         error_msg = f"Unexpected error: {str(e)}"
         print(f"❌ [BLEND TOOL] {error_msg}", file=sys.stderr)
-        return {
-            "success": False,
-            "errors": [error_msg],
-            "blend_url": None,
-            "blend_name": blend_name,
-            "price": 0.0,
-            "servings": 0,
-            "nutritional_info": {}
-        }
+        return BlendCreationResponse(
+            success=False,
+            errors=[error_msg],
+            blend_name=blend_name
+        )
 
 
 # ============================================================================
@@ -324,11 +351,12 @@ def _build_api_request(
     # Build ingredients array
     formatted_ingredients = []
     for ing in ingredients:
+        # Convert Pydantic model to dict
         formatted_ingredients.append({
-            "ingredientId": ing["ingredientId"],
-            "name": ing["name"],
-            "amount": ing["amount"],
-            "description": ing.get("description", "")
+            "ingredientId": ing.ingredientId,
+            "name": ing.name,
+            "amount": ing.amount,
+            "description": ing.description
         })
 
     # Build complete request
@@ -346,7 +374,7 @@ def _build_api_request(
     return request
 
 
-def _format_response(api_response: dict) -> dict:
+def _format_response(api_response: dict) -> BlendCreationResponse:
     """
     Format production API response for AI agent consumption.
 
@@ -362,24 +390,24 @@ def _format_response(api_response: dict) -> dict:
     blend_info = api_response.get("blendInformation", {})
     nutritional_info = api_response.get("nutritionalInformation", {})
 
-    return {
-        "success": success,
-        "errors": errors,
-        "blend_url": api_response.get("URLForBlend", ""),
-        "product_image_url": api_response.get("ProductImagePath", ""),
-        "nutritional_label_url": api_response.get("NutritionalLabel", ""),
-        "blend_name": blend_info.get("BlendName", ""),
-        "price": blend_info.get("Price", 0.0),
-        "servings": blend_info.get("NumberOfServings", 0),
-        "base_mix": blend_info.get("BaseMix", ""),
-        "nutritional_info": {
-            "calories": nutritional_info.get("calories", 0),
-            "protein": nutritional_info.get("protein", 0),
-            "carbohydrates": nutritional_info.get("carbohydrates", 0),
-            "fats": nutritional_info.get("fats", 0),
-            "fiber": nutritional_info.get("fiber", 0),
-            "energy": nutritional_info.get("energy", 0)
-        },
-        "ingredients": api_response.get("ingredients", []),
-        "add_mixes": api_response.get("addMixes", [])
-    }
+    return BlendCreationResponse(
+        success=success,
+        errors=errors,
+        blend_url=api_response.get("URLForBlend", ""),
+        product_image_url=api_response.get("ProductImagePath", ""),
+        nutritional_label_url=api_response.get("NutritionalLabel", ""),
+        blend_name=blend_info.get("BlendName", ""),
+        price=blend_info.get("Price", 0.0),
+        servings=blend_info.get("NumberOfServings", 0),
+        base_mix=blend_info.get("BaseMix", ""),
+        nutritional_info=NutritionalInfo(
+            calories=nutritional_info.get("calories", 0),
+            protein=nutritional_info.get("protein", 0.0),
+            carbohydrates=nutritional_info.get("carbohydrates", 0.0),
+            fats=nutritional_info.get("fats", 0.0),
+            fiber=nutritional_info.get("fiber", 0.0),
+            energy=nutritional_info.get("energy", 0.0)
+        ),
+        ingredients=api_response.get("ingredients", []),
+        add_mixes=api_response.get("addMixes", [])
+    )

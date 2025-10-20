@@ -298,7 +298,7 @@ def _build_api_request(
     base_mix_id: int,
     base_mix_info: dict,
     add_mix_ids: List[int],
-    ingredients: List[Dict]
+    ingredients: List[IngredientInput]
 ) -> dict:
     """
     Build complete API request matching production schema.

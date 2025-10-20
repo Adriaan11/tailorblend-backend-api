@@ -11,9 +11,36 @@ This agent:
 4. Provides expert recommendations with reasoning
 """
 
+import sys
 from agents import Agent, ModelSettings
 from config.settings import load_instructions
 from tb_agents.database_loader import get_combined_database
+
+
+# Markdown formatting instruction for all agent responses
+# Includes "Formatting re-enabled" for GPT-5/reasoning models (o1, o3, o3-mini)
+# and explicit formatting requirements for GPT-4.1 and clarity
+MARKDOWN_FORMATTING_INSTRUCTION = """Formatting re-enabled
+
+═══════════════════════════════════════════════════════════════
+CRITICAL: OUTPUT FORMAT REQUIREMENT
+═══════════════════════════════════════════════════════════════
+
+You must synthesize all consultation information into well-structured
+markdown responses. This is not optional.
+
+Required formatting:
+- **Bold** for supplement names, dosages, base mix types, and key terms
+- Bullet lists (- or •) for ingredient lists, benefits, and recommendations
+- Numbered lists (1., 2., 3.) for sequential consultation steps
+- Headers (## for main sections, ### for subsections) to organize content
+- `code-style formatting` for precise measurements (e.g., `500mg`, `2x daily`)
+
+Every response must use markdown syntax for clarity and professional
+presentation. Plain text responses are not acceptable.
+
+═══════════════════════════════════════════════════════════════
+"""
 
 
 def create_tailorblend_consultant(
@@ -83,8 +110,22 @@ def create_tailorblend_consultant(
     # without needing to query an external vector store
     database_context = get_combined_database()
 
-    # Append database to instructions so agent has full context
-    full_instructions = f"{instructions}\n\n{database_context}"
+    # Smart detection: Only append markdown formatting if not already mentioned
+    # This prevents duplication if custom_instructions already specify markdown
+    needs_markdown_instruction = "markdown" not in instructions.lower()
+
+    if needs_markdown_instruction:
+        # Append markdown formatting requirement
+        full_instructions = f"{instructions}\n\n{database_context}{MARKDOWN_FORMATTING_INSTRUCTION}"
+        print(f"✨ [CONSULTANT] Appended markdown formatting instruction to agent", file=sys.stderr)
+    else:
+        # Instructions already mention markdown, don't duplicate
+        full_instructions = f"{instructions}\n\n{database_context}"
+        print(f"✨ [CONSULTANT] Instructions already contain markdown guidance, skipping append", file=sys.stderr)
+
+    # Log first 500 characters of final instructions for verification
+    instructions_preview = full_instructions[:500].replace('\n', ' ')
+    print(f"📋 [CONSULTANT] Final instructions preview: {instructions_preview}...", file=sys.stderr)
 
     # Create agent with complete database in memory
     agent = Agent(

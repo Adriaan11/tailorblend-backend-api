@@ -584,26 +584,15 @@ async def generate_chat_stream(
         if session_id in conversation_state:
             previous_response_id = conversation_state[session_id].get("previous_response_id")
 
-        # Inject hidden formatting instruction on first message
-        # This tells the AI to always use markdown while staying conversational
-        actual_message = message
-        if is_first_message:
-            hidden_instruction = (
-                "[SYSTEM INSTRUCTION: Always format your responses using markdown syntax "
-                "(use **bold** for important terms like supplement names, use bullet lists "
-                "for recommendations, use numbered lists for steps, use headers for sections). "
-                "Stay warm and conversational, but structure your responses with markdown. "
-                "This makes your responses clearer and more professional.]\n\n"
-            )
-            actual_message = hidden_instruction + message
-            print(f"✨ [FORMATTING] Injected markdown instruction for first message", file=sys.stderr)
+        # NOTE: Markdown formatting is now handled in agent instructions (consultant.py)
+        # No need to inject into user message - instructions define agent behavior
 
         # Determine message format based on attachments
         if attachments:
             try:
                 print(f"📎 [API] Building message with {len(attachments)} attachment(s)", file=sys.stderr)
                 # Build message list with attachments for SDK
-                message_content = build_message_content(actual_message, attachments)
+                message_content = build_message_content(message, attachments)
                 print(f"📎 [API] Built {len(message_content)} content items", file=sys.stderr)
 
                 message_list = [
@@ -650,7 +639,7 @@ async def generate_chat_stream(
                 print(f"💬 [API] GPT-5 detected - using non-streaming mode", file=sys.stderr)
                 result = await Runner.run(
                     agent,
-                    actual_message,
+                    message,
                     previous_response_id=previous_response_id,
                     run_config=run_config
                 )
@@ -659,7 +648,7 @@ async def generate_chat_stream(
                 print(f"💬 [API] Sending text-only message", file=sys.stderr)
                 result = Runner.run_streamed(
                     agent,
-                    actual_message,
+                    message,
                     previous_response_id=previous_response_id,
                     run_config=run_config
                 )

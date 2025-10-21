@@ -10,13 +10,19 @@ This module provides:
 - get_combined_database() - Both databases formatted for agent context
 """
 
+import asyncio
 import json
 from pathlib import Path
 from typing import Optional
+import aiofiles
 
 # Module-level cache (loaded once at import time)
 _CACHED_INGREDIENTS: Optional[str] = None
 _CACHED_BASE_MIXES: Optional[str] = None
+
+# Locks to prevent race conditions during concurrent initialization
+_ingredients_lock = asyncio.Lock()
+_base_mixes_lock = asyncio.Lock()
 
 
 def _get_spec_path(filename: str) -> Path:
@@ -25,7 +31,7 @@ def _get_spec_path(filename: str) -> Path:
     return project_root / "spec" / filename
 
 
-def load_ingredients_database() -> str:
+async def load_ingredients_database() -> str:
     """
     Load and format the ingredients database (Ingredients3.json).
 
@@ -36,53 +42,61 @@ def load_ingredients_database() -> str:
     - Special notes/constraints
 
     Results are cached at module level for performance.
+    Uses asyncio.Lock to prevent race conditions during concurrent initialization.
 
     Returns:
         str: Formatted ingredient database ready for agent context
     """
     global _CACHED_INGREDIENTS
 
-    # Return cached version if available
+    # Fast path: return cached version if available (no lock needed for reads)
     if _CACHED_INGREDIENTS is not None:
         return _CACHED_INGREDIENTS
 
-    # Load and format
-    ingredients_file = _get_spec_path("Ingredients3.json")
+    # Slow path: acquire lock to ensure only one coroutine loads the file
+    async with _ingredients_lock:
+        # Double-check after acquiring lock (another coroutine may have loaded it)
+        if _CACHED_INGREDIENTS is not None:
+            return _CACHED_INGREDIENTS
 
-    with open(ingredients_file, 'r', encoding='utf-8') as f:
-        ingredients = json.load(f)
+        # Load and format
+        ingredients_file = _get_spec_path("Ingredients3.json")
 
-    # Format ingredients as readable text for agent
-    formatted_lines = [
-        "=" * 80,
-        "INGREDIENTS DATABASE (111 Available Ingredients)",
-        "=" * 80,
-        ""
-    ]
+        async with aiofiles.open(ingredients_file, 'r', encoding='utf-8') as f:
+            content = await f.read()
+            ingredients = json.loads(content)
 
-    for ing in ingredients:
-        # Get fields with safe fallbacks for different JSON schema versions
-        ing_id = ing.get('ingredientId', 'N/A')
-        name = ing.get('name', 'Unknown')
-        min_range = ing.get('minimumRange', ing.get('minimumrange', 'N/A'))
-        rec_range = ing.get('reccomendedRange', ing.get('reccomendedrange', 'N/A'))
-        max_range = ing.get('customerMaxRange', ing.get('customermaxrange', 'N/A'))
-        unit = ing.get('unitOfMeasureName', ing.get('unitofmeasurename', 'units'))
-        cost = ing.get('pricePer30Servings', ing.get('priceper30servings', '0.00'))
-        overview = ing.get('overview', '')
+        # Format ingredients as readable text for agent
+        formatted_lines = [
+            "=" * 80,
+            "INGREDIENTS DATABASE (111 Available Ingredients)",
+            "=" * 80,
+            ""
+        ]
 
-        formatted_lines.append(f"• {name} (ID: {ing_id})")
-        formatted_lines.append(f"  Dosage Range: {min_range} - {rec_range} {unit} (Max: {max_range} {unit})")
-        formatted_lines.append(f"  Cost: R{cost} per 30 servings")
-        if overview:
-            formatted_lines.append(f"  Notes: {overview}")
-        formatted_lines.append("")  # Blank line between ingredients
+        for ing in ingredients:
+            # Get fields with safe fallbacks for different JSON schema versions
+            ing_id = ing.get('ingredientId', 'N/A')
+            name = ing.get('name', 'Unknown')
+            min_range = ing.get('minimumRange', ing.get('minimumrange', 'N/A'))
+            rec_range = ing.get('reccomendedRange', ing.get('reccomendedrange', 'N/A'))
+            max_range = ing.get('customerMaxRange', ing.get('customermaxrange', 'N/A'))
+            unit = ing.get('unitOfMeasureName', ing.get('unitofmeasurename', 'units'))
+            cost = ing.get('pricePer30Servings', ing.get('priceper30servings', '0.00'))
+            overview = ing.get('overview', '')
 
-    _CACHED_INGREDIENTS = "\n".join(formatted_lines)
-    return _CACHED_INGREDIENTS
+            formatted_lines.append(f"• {name} (ID: {ing_id})")
+            formatted_lines.append(f"  Dosage Range: {min_range} - {rec_range} {unit} (Max: {max_range} {unit})")
+            formatted_lines.append(f"  Cost: R{cost} per 30 servings")
+            if overview:
+                formatted_lines.append(f"  Notes: {overview}")
+            formatted_lines.append("")  # Blank line between ingredients
+
+        _CACHED_INGREDIENTS = "\n".join(formatted_lines)
+        return _CACHED_INGREDIENTS
 
 
-def load_base_mixes_database() -> str:
+async def load_base_mixes_database() -> str:
     """
     Load and format the base mixes database (BaseAddMixes2.json).
 
@@ -92,69 +106,87 @@ def load_base_mixes_database() -> str:
     - Default selections marked
 
     Results are cached at module level for performance.
+    Uses asyncio.Lock to prevent race conditions during concurrent initialization.
 
     Returns:
         str: Formatted base mixes database ready for agent context
     """
     global _CACHED_BASE_MIXES
 
-    # Return cached version if available
+    # Fast path: return cached version if available (no lock needed for reads)
     if _CACHED_BASE_MIXES is not None:
         return _CACHED_BASE_MIXES
 
-    # Load and format
-    base_mixes_file = _get_spec_path("BaseAddMixes2.json")
+    # Slow path: acquire lock to ensure only one coroutine loads the file
+    async with _base_mixes_lock:
+        # Double-check after acquiring lock (another coroutine may have loaded it)
+        if _CACHED_BASE_MIXES is not None:
+            return _CACHED_BASE_MIXES
 
-    with open(base_mixes_file, 'r', encoding='utf-8') as f:
-        base_mixes = json.load(f)
+        # Load and format
+        base_mixes_file = _get_spec_path("BaseAddMixes2.json")
 
-    # Group by baseMixId for clearer presentation
-    base_mix_groups = {}
-    for item in base_mixes:
-        base_id = item['baseMixId']
-        if base_id not in base_mix_groups:
-            base_mix_groups[base_id] = {
-                'name': item['baseMixName'],
-                'options': {}
-            }
+        async with aiofiles.open(base_mixes_file, 'r', encoding='utf-8') as f:
+            content = await f.read()
+            base_mixes = json.loads(content)
 
-        add_type = item['addMixTypeName']
-        if add_type not in base_mix_groups[base_id]['options']:
-            base_mix_groups[base_id]['options'][add_type] = []
+        # Group by baseMixId for clearer presentation
+        base_mix_groups = {}
+        for item in base_mixes:
+            # Use .get() with fallbacks to handle schema drift gracefully
+            base_id = item.get('baseMixId')
+            base_name = item.get('baseMixName', 'Unknown')
+            add_type = item.get('addMixTypeName')
+            add_id = item.get('addMixId')
+            add_name = item.get('addMixName', 'Unknown')
+            default_flag = bool(item.get('defaultFlag', False))
 
-        base_mix_groups[base_id]['options'][add_type].append({
-            'id': item['addMixId'],
-            'name': item['addMixName'],
-            'default': item['defaultFlag']
-        })
+            # Skip malformed entries (missing required fields)
+            if base_id is None or add_type is None or add_id is None:
+                continue
 
-    # Format as readable text
-    formatted_lines = [
-        "",
-        "=" * 80,
-        "BASE MIX & CUSTOMIZATION OPTIONS (4 Base Types, 68 Options)",
-        "=" * 80,
-        ""
-    ]
+            if base_id not in base_mix_groups:
+                base_mix_groups[base_id] = {
+                    'name': base_name,
+                    'options': {}
+                }
 
-    for base_id, base_info in sorted(base_mix_groups.items()):
-        formatted_lines.append(f"\n{'*' * 80}")
-        formatted_lines.append(f"BASE MIX (ID: {base_id}): {base_info['name']}")
-        formatted_lines.append(f"{'*' * 80}")
+            if add_type not in base_mix_groups[base_id]['options']:
+                base_mix_groups[base_id]['options'][add_type] = []
 
-        for add_type, options in sorted(base_info['options'].items()):
-            formatted_lines.append(f"\n  {add_type} Options:")
-            for opt in options:
-                default_marker = " [DEFAULT]" if opt['default'] else ""
-                formatted_lines.append(f"    - Add-Mix ID {opt['id']}: {opt['name']}{default_marker}")
+            base_mix_groups[base_id]['options'][add_type].append({
+                'id': add_id,
+                'name': add_name,
+                'default': default_flag
+            })
 
-        formatted_lines.append("")  # Blank line between base mixes
+        # Format as readable text
+        formatted_lines = [
+            "",
+            "=" * 80,
+            "BASE MIX & CUSTOMIZATION OPTIONS (4 Base Types, 68 Options)",
+            "=" * 80,
+            ""
+        ]
 
-    _CACHED_BASE_MIXES = "\n".join(formatted_lines)
-    return _CACHED_BASE_MIXES
+        for base_id, base_info in sorted(base_mix_groups.items()):
+            formatted_lines.append(f"\n{'*' * 80}")
+            formatted_lines.append(f"BASE MIX (ID: {base_id}): {base_info['name']}")
+            formatted_lines.append(f"{'*' * 80}")
+
+            for add_type, options in sorted(base_info['options'].items()):
+                formatted_lines.append(f"\n  {add_type} Options:")
+                for opt in options:
+                    default_marker = " [DEFAULT]" if opt['default'] else ""
+                    formatted_lines.append(f"    - Add-Mix ID {opt['id']}: {opt['name']}{default_marker}")
+
+            formatted_lines.append("")  # Blank line between base mixes
+
+        _CACHED_BASE_MIXES = "\n".join(formatted_lines)
+        return _CACHED_BASE_MIXES
 
 
-def get_combined_database() -> str:
+async def get_combined_database() -> str:
     """
     Get both ingredients and base mixes databases combined.
 
@@ -164,8 +196,8 @@ def get_combined_database() -> str:
     Returns:
         str: Complete formatted database (ingredients + base mixes)
     """
-    ingredients = load_ingredients_database()
-    base_mixes = load_base_mixes_database()
+    ingredients = await load_ingredients_database()
+    base_mixes = await load_base_mixes_database()
 
     return f"{ingredients}\n{base_mixes}"
 

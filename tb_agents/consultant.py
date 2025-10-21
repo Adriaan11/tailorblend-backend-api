@@ -11,11 +11,14 @@ This agent:
 4. Provides expert recommendations with reasoning
 """
 
-import sys
+import logging
 from agents import Agent, ModelSettings
 from config.settings import load_instructions
 from tb_agents.database_loader import get_combined_database
 from tb_agents.tools import create_personalized_blend
+
+# Configure module logger
+logger = logging.getLogger(__name__)
 
 
 # Markdown formatting instruction for all agent responses
@@ -44,7 +47,7 @@ presentation. Plain text responses are not acceptable.
 """
 
 
-def create_tailorblend_consultant(
+async def create_tailorblend_consultant(
     custom_instructions: str = None,
     model: str = "gpt-5",
     model_settings: ModelSettings = None
@@ -83,14 +86,14 @@ def create_tailorblend_consultant(
         >>> from agents import Runner
         >>>
         >>> # Use default instructions and model
-        >>> agent = create_tailorblend_consultant()
+        >>> agent = await create_tailorblend_consultant()
         >>>
         >>> # Use custom instructions
         >>> custom = "Be more concise..."
-        >>> agent = create_tailorblend_consultant(custom_instructions=custom)
+        >>> agent = await create_tailorblend_consultant(custom_instructions=custom)
         >>>
         >>> # Use different model
-        >>> agent = create_tailorblend_consultant(model="gpt-5-mini-2025-08-07")
+        >>> agent = await create_tailorblend_consultant(model="gpt-5-mini-2025-08-07")
         >>>
         >>> result = await Runner.run(
         ...     agent,
@@ -104,12 +107,12 @@ def create_tailorblend_consultant(
     else:
         # Load full instructions from spec/instructions.txt
         # This is the "system prompt" containing all business logic
-        instructions = load_instructions()
+        instructions = await load_instructions()
 
     # Load complete database into agent memory
     # This gives the agent instant access to all ingredients and base mixes
     # without needing to query an external vector store
-    database_context = get_combined_database()
+    database_context = await get_combined_database()
 
     # Smart detection: Only append markdown formatting if not already mentioned
     # This prevents duplication if custom_instructions already specify markdown
@@ -118,15 +121,15 @@ def create_tailorblend_consultant(
     if needs_markdown_instruction:
         # Append markdown formatting requirement
         full_instructions = f"{instructions}\n\n{database_context}{MARKDOWN_FORMATTING_INSTRUCTION}"
-        print(f"✨ [CONSULTANT] Appended markdown formatting instruction to agent", file=sys.stderr)
+        logger.debug("Appended markdown formatting instruction to agent")
     else:
         # Instructions already mention markdown, don't duplicate
         full_instructions = f"{instructions}\n\n{database_context}"
-        print(f"✨ [CONSULTANT] Instructions already contain markdown guidance, skipping append", file=sys.stderr)
+        logger.debug("Instructions already contain markdown guidance, skipping append")
 
     # Log first 500 characters of final instructions for verification
     instructions_preview = full_instructions[:500].replace('\n', ' ')
-    print(f"📋 [CONSULTANT] Final instructions preview: {instructions_preview}...", file=sys.stderr)
+    logger.debug("Final instructions preview: %s...", instructions_preview)
 
     # Create agent with complete database in memory
     agent = Agent(

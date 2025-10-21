@@ -10,6 +10,7 @@ import sys
 from pathlib import Path
 from typing import Optional
 from dotenv import load_dotenv
+import aiofiles
 
 # Load environment variables
 load_dotenv()
@@ -21,7 +22,7 @@ INSTRUCTIONS_FILE = SPEC_DIR / "instructions.txt"
 PRACTITIONER_INSTRUCTIONS_FILE = SPEC_DIR / "practitioner-instructions.txt"
 
 
-def load_instructions() -> str:
+async def load_instructions() -> str:
     """
     Load instructions.txt as the system prompt for the agent.
 
@@ -40,8 +41,8 @@ def load_instructions() -> str:
             f"Please ensure spec/instructions.txt exists."
         )
 
-    with open(INSTRUCTIONS_FILE, 'r', encoding='utf-8') as f:
-        instructions = f.read()
+    async with aiofiles.open(INSTRUCTIONS_FILE, 'r', encoding='utf-8') as f:
+        instructions = await f.read()
 
     # Validate it's not empty
     if not instructions.strip():
@@ -50,7 +51,7 @@ def load_instructions() -> str:
     return instructions
 
 
-def load_practitioner_instructions() -> str:
+async def load_practitioner_instructions() -> str:
     """
     Load practitioner-instructions.txt as the system prompt for practitioner mode.
 
@@ -70,8 +71,8 @@ def load_practitioner_instructions() -> str:
             f"Please ensure spec/practitioner-instructions.txt exists."
         )
 
-    with open(PRACTITIONER_INSTRUCTIONS_FILE, 'r', encoding='utf-8') as f:
-        instructions = f.read()
+    async with aiofiles.open(PRACTITIONER_INSTRUCTIONS_FILE, 'r', encoding='utf-8') as f:
+        instructions = await f.read()
 
     # Validate it's not empty
     if not instructions.strip():

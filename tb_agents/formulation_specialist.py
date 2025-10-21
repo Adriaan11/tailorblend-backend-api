@@ -13,7 +13,7 @@ from backend.models import FormulationConfig, SupplementRecommendation
 from tb_agents.database_loader import load_base_mixes_database
 
 
-def create_formulation_specialist() -> Agent:
+async def create_formulation_specialist() -> Agent:
     """
     Create the Formulation Specialist agent.
 
@@ -30,7 +30,7 @@ def create_formulation_specialist() -> Agent:
 
     # Load all base mixes into agent context from shared loader
     # This uses module-level caching for performance
-    base_mixes_data = load_base_mixes_database()
+    base_mixes_data = await load_base_mixes_database()
 
     instructions = f"""You are a formulation specialist expert in TailorBlend product configuration.
 

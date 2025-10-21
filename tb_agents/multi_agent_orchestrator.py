@@ -31,9 +31,16 @@ class MultiAgentOrchestrator:
     """
 
     def __init__(self):
-        """Initialize both specialized agents."""
-        self.supplement_agent = create_supplement_specialist()
-        self.formulation_agent = create_formulation_specialist()
+        """Initialize both specialized agents (placeholder, actual init is async)."""
+        self.supplement_agent = None
+        self.formulation_agent = None
+
+    async def _ensure_agents_initialized(self):
+        """Ensure agents are initialized (async lazy loading)."""
+        if self.supplement_agent is None:
+            self.supplement_agent = await create_supplement_specialist()
+        if self.formulation_agent is None:
+            self.formulation_agent = await create_formulation_specialist()
 
     async def create_blend(
         self,
@@ -53,6 +60,9 @@ class MultiAgentOrchestrator:
         """
 
         try:
+            # Ensure agents are initialized
+            await self._ensure_agents_initialized()
+
             # ====================================================================
             # STEP 1: Supplement Specialist - Select Ingredients
             # ====================================================================

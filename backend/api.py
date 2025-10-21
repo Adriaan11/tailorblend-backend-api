@@ -22,7 +22,7 @@ import logging
 from typing import Optional, Dict, List
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Query, Form, Request, HTTPException
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 import uvicorn
@@ -302,10 +302,17 @@ async def _heavy_init():
         # This is the expensive operation that was blocking startup
         multi_agent_orchestrator = MultiAgentOrchestrator()
 
-        logger.info("✅ [BACKGROUND] MultiAgentOrchestrator initialized successfully")
+        logger.info("✅ [BACKGROUND] MultiAgentOrchestrator instantiated")
+
+        # CRITICAL: Actually initialize agents to ensure databases are loaded
+        # This prevents readiness probe from passing before we can serve requests
+        logger.info("🔄 [BACKGROUND] Loading agent databases (ingredients + base mixes)...")
+        await multi_agent_orchestrator._ensure_agents_initialized()
+
+        logger.info("✅ [BACKGROUND] Agents fully initialized with databases loaded")
         logger.info("✅ [BACKGROUND] Heavy initialization complete")
 
-        # Now mark as ready
+        # Now mark as ready - we can actually serve blend requests
         is_ready = True
         logger.info("🎉 [BACKGROUND] Application is now READY for full requests")
 
@@ -441,7 +448,7 @@ logger.info("✅ State management initialized")
 # ============================================================================
 
 @app.get("/health")
-def health():
+async def health():
     """
     Root-level health check for Railway liveness probe.
     MUST be ultra-fast and ALWAYS return 200.
@@ -451,16 +458,16 @@ def health():
 
 
 @app.get("/ping")
-def ping():
+async def ping():
     """
-    Ultra-simple synchronous ping endpoint for debugging routing.
-    No async, no complex logic - just returns immediately.
+    Ultra-simple ping endpoint for debugging routing.
+    Fast async endpoint that returns immediately.
     """
     return {"pong": "ok"}
 
 
 @app.get("/")
-def root():
+async def root():
     """
     Root endpoint for basic connectivity check.
     """
@@ -473,7 +480,7 @@ def root():
 
 
 @app.get("/api/health")
-def health_check():
+async def health_check():
     """
     Liveness probe - MUST return 200 immediately after startup.
     This is called by Railway/Docker to ensure app is alive.
@@ -487,18 +494,21 @@ def health_check():
 
 
 @app.get("/api/ready")
-def readiness_check():
+async def readiness_check():
     """
     Readiness probe - Returns 200 only when app is fully warm and ready for requests.
     Use this for sophisticated load balancers/orchestrators.
     Railway uses /api/health (liveness), not this endpoint.
 
     Returns:
-        dict: Ready status and details
+        JSONResponse: Ready status and details with appropriate status code
     """
     global is_ready
     if not is_ready:
-        return {"ready": False, "status": "warming up"}, 503
+        return JSONResponse(
+            {"ready": False, "status": "warming up"},
+            status_code=503
+        )
 
     return {
         "ready": True,
@@ -542,7 +552,7 @@ async def generate_chat_stream(
         if instructions_to_use is None:
             # Load appropriate instructions based on mode
             if practitioner_mode:
-                instructions_to_use = load_practitioner_instructions()
+                instructions_to_use = await load_practitioner_instructions()
                 print(f"🩺 [API] Using practitioner instructions for chat ({len(instructions_to_use)} chars)", file=sys.stderr)
             elif "default" in custom_instructions_cache:
                 instructions_to_use = custom_instructions_cache["default"]
@@ -562,14 +572,14 @@ async def generate_chat_stream(
                 reasoning=Reasoning(effort=reasoning_effort),
                 verbosity=verbosity
             )
-            agent = create_tailorblend_consultant(
+            agent = await create_tailorblend_consultant(
                 custom_instructions=instructions_to_use,
                 model=model,
                 model_settings=model_settings
             )
         else:
             # GPT-4.x models - no special settings needed
-            agent = create_tailorblend_consultant(
+            agent = await create_tailorblend_consultant(
                 custom_instructions=instructions_to_use,
                 model=model
             )
@@ -740,7 +750,7 @@ async def generate_chat_stream(
             if custom_instructions:
                 instructions_to_count = custom_instructions
             else:
-                instructions_to_count = load_instructions()
+                instructions_to_count = await load_instructions()
 
             estimated_input = count_tokens(instructions_to_count) + count_tokens(message)
             estimated_output = count_tokens(accumulated_response)
@@ -1062,7 +1072,7 @@ async def get_instructions():
             instructions = custom_instructions_cache["default"]
             print(f"📖 [API] Returning cached custom instructions ({len(instructions)} chars)", file=sys.stderr)
         else:
-            instructions = load_instructions()
+            instructions = await load_instructions()
             print(f"📖 [API] Returning default instructions from disk", file=sys.stderr)
 
         sections = parse_instructions(instructions)

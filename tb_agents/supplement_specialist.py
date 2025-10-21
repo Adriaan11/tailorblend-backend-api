@@ -4,7 +4,7 @@ Supplement Specialist Agent
 This agent is a clinical nutrition expert that selects optimal ingredients
 and calculates appropriate dosages based on patient health goals and profile.
 
-The agent has complete access to all 112 ingredients with their dosage ranges,
+The agent has complete access to all 111 ingredients with their dosage ranges,
 costs, and constraints loaded directly into its context.
 """
 

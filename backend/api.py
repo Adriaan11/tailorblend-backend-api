@@ -22,7 +22,7 @@ import logging
 from typing import Optional, Dict, List
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Query, Form, Request, HTTPException
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 import uvicorn
@@ -302,10 +302,17 @@ async def _heavy_init():
         # This is the expensive operation that was blocking startup
         multi_agent_orchestrator = MultiAgentOrchestrator()
 
-        logger.info("✅ [BACKGROUND] MultiAgentOrchestrator initialized successfully")
+        logger.info("✅ [BACKGROUND] MultiAgentOrchestrator instantiated")
+
+        # CRITICAL: Actually initialize agents to ensure databases are loaded
+        # This prevents readiness probe from passing before we can serve requests
+        logger.info("🔄 [BACKGROUND] Loading agent databases (ingredients + base mixes)...")
+        await multi_agent_orchestrator._ensure_agents_initialized()
+
+        logger.info("✅ [BACKGROUND] Agents fully initialized with databases loaded")
         logger.info("✅ [BACKGROUND] Heavy initialization complete")
 
-        # Now mark as ready
+        # Now mark as ready - we can actually serve blend requests
         is_ready = True
         logger.info("🎉 [BACKGROUND] Application is now READY for full requests")
 
@@ -494,11 +501,14 @@ async def readiness_check():
     Railway uses /api/health (liveness), not this endpoint.
 
     Returns:
-        dict: Ready status and details
+        JSONResponse: Ready status and details with appropriate status code
     """
     global is_ready
     if not is_ready:
-        return {"ready": False, "status": "warming up"}, 503
+        return JSONResponse(
+            {"ready": False, "status": "warming up"},
+            status_code=503
+        )
 
     return {
         "ready": True,

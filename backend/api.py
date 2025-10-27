@@ -164,7 +164,7 @@ class ChatRequest(BaseModel):
     message: str = Field(..., description="User message text")
     session_id: str = Field(..., description="Session identifier")
     custom_instructions: Optional[str] = Field(None, description="Custom instructions override")
-    model: str = Field("gpt-5", description="OpenAI model to use")
+    model: str = Field("gpt-5-mini", description="OpenAI model to use")
     attachments: List[FileAttachment] = Field(default_factory=list, description="File attachments")
     practitioner_mode: bool = Field(False, description="Use practitioner-specific instructions")
     reasoning_effort: Optional[str] = Field("minimal", description="Reasoning effort for GPT-5 models (minimal/low/medium/high)")
@@ -522,7 +522,7 @@ async def generate_chat_stream(
     message: str,
     session_id: str,
     custom_instructions: Optional[str] = None,
-    model: str = "gpt-5",
+    model: str = "gpt-5-mini",
     attachments: List[FileAttachment] = [],
     practitioner_mode: bool = False,
     reasoning_effort: Optional[str] = "minimal",
@@ -916,7 +916,7 @@ async def stream_chat_get(
     message: str = Query(..., description="User message"),
     session_id: str = Query(..., description="Session identifier"),
     custom_instructions: Optional[str] = Query(None, description="Custom instructions override"),
-    model: str = Query("gpt-5", description="OpenAI model to use")
+    model: str = Query("gpt-5-mini", description="OpenAI model to use")
 ):
     """
     Stream chat response using Server-Sent Events (SSE) - GET endpoint.
@@ -929,7 +929,7 @@ async def stream_chat_get(
         message: User's message
         session_id: Session identifier for conversation continuity
         custom_instructions: Optional custom instructions from Configuration editor
-        model: OpenAI model to use (defaults to gpt-4.1-mini-2025-04-14)
+        model: OpenAI model to use (defaults to gpt-5-mini)
 
     Returns:
         StreamingResponse: SSE stream of response tokens
@@ -1030,7 +1030,7 @@ async def get_session_stats(session_id: str = Query(..., description="Session id
     input_tokens = stats.get("total_input_tokens", 0)
     output_tokens = stats.get("total_output_tokens", 0)
     total_tokens = input_tokens + output_tokens
-    model = stats.get("model", "gpt-5")
+    model = stats.get("model", "gpt-5-mini")
 
     print(f"📊 [STATS] Input tokens: {input_tokens}", file=sys.stderr)
     print(f"📊 [STATS] Output tokens: {output_tokens}", file=sys.stderr)

@@ -554,13 +554,11 @@ async def generate_chat_stream(
             if practitioner_mode:
                 instructions_to_use = await load_practitioner_instructions()
                 print(f"🩺 [API] Using practitioner instructions for chat ({len(instructions_to_use)} chars)", file=sys.stderr)
-            elif "default" in custom_instructions_cache:
-                instructions_to_use = custom_instructions_cache["default"]
-                print(f"✨ [API] Using cached custom instructions for chat ({len(instructions_to_use)} chars)", file=sys.stderr)
             else:
-                print(f"📋 [API] Using default consumer instructions for chat", file=sys.stderr)
+                # Always load default instructions.txt if no custom prompt provided
+                print(f"📋 [API] Using default instructions.txt from disk", file=sys.stderr)
         else:
-            print(f"✨ [API] Using explicit custom instructions for chat ({len(instructions_to_use)} chars)", file=sys.stderr)
+            print(f"🎯 [API] Using custom prompt from DATABASE ({len(instructions_to_use)} chars) - NOT instructions.txt", file=sys.stderr)
 
         # Create agent with custom instructions and selected model
         # For GPT-5 models, add reasoning and verbosity settings
@@ -1060,20 +1058,18 @@ async def get_instructions():
     """
     Get current instructions (for Configuration editor).
 
-    Returns custom instructions from cache if available,
-    otherwise returns default instructions from disk.
+    DEPRECATED: This endpoint is no longer used.
+    Prompts are now managed via SQL database in Blazor frontend.
+    Returns default instructions.txt for backward compatibility.
 
     Returns:
         dict: Instructions parsed into sections
     """
     try:
-        # Check cache first before loading from disk
-        if "default" in custom_instructions_cache:
-            instructions = custom_instructions_cache["default"]
-            print(f"📖 [API] Returning cached custom instructions ({len(instructions)} chars)", file=sys.stderr)
-        else:
-            instructions = await load_instructions()
-            print(f"📖 [API] Returning default instructions from disk", file=sys.stderr)
+        # Always return default instructions from disk
+        # Custom instructions cache is disabled - use database prompts instead
+        instructions = await load_instructions()
+        print(f"📖 [API] Returning default instructions.txt from disk (custom cache DISABLED)", file=sys.stderr)
 
         sections = parse_instructions(instructions)
 
@@ -1094,7 +1090,9 @@ async def update_instructions(data: dict):
     """
     Update instructions from Configuration editor.
 
-    Saves to both in-memory cache and persistent disk storage.
+    DEPRECATED: This endpoint is no longer used.
+    Prompts are now managed via SQL database in Blazor frontend.
+    Returns error for backward compatibility.
 
     Args:
         data: Dict with either:
@@ -1102,33 +1100,15 @@ async def update_instructions(data: dict):
               - "raw_text" key containing complete instructions (raw mode)
 
     Returns:
-        dict: Success status
+        dict: Error status
     """
-    try:
-        # Check if raw text mode
-        if "raw_text" in data:
-            instructions = data.get("raw_text", "")
-            print(f"📝 [API] Updating RAW instructions ({len(instructions)} chars)", file=sys.stderr)
-        else:
-            # Granular sections mode
-            sections = data.get("sections", {})
-            instructions = reassemble_instructions(sections)
-            print(f"📝 [API] Updating GRANULAR instructions ({len(sections)} sections)", file=sys.stderr)
+    print(f"⚠️ [API] DEPRECATED: /api/instructions POST called - custom cache is DISABLED", file=sys.stderr)
+    print(f"⚠️ [API] Use SQL database prompts via /configuration page instead", file=sys.stderr)
 
-        # Store in cache (in-memory only - resets on API restart)
-        custom_instructions_cache["default"] = instructions
-        print(f"💾 [API] Updated custom instructions in cache ({len(instructions)} chars)", file=sys.stderr)
-
-        return {
-            "success": True,
-            "message": "Instructions updated successfully (session only - resets on API restart)"
-        }
-    except Exception as e:
-        print(f"❌ [API] Failed to update instructions: {e}", file=sys.stderr)
-        return {
-            "success": False,
-            "error": str(e)
-        }
+    return {
+        "success": False,
+        "error": "This endpoint is deprecated. Use the Prompts management page (/configuration) to manage system prompts via SQL database."
+    }
 
 
 @app.post("/api/instructions/reset")
@@ -1136,32 +1116,18 @@ async def reset_instructions():
     """
     Reset to default instructions (clear custom cache).
 
-    Clears the in-memory custom instructions cache,
-    returning to the default instructions from spec/instructions.txt.
+    DEPRECATED: This endpoint is no longer used.
+    Custom instructions cache is disabled.
 
     Returns:
-        dict: Success status
+        dict: Error status
     """
-    try:
-        # Clear in-memory cache
-        if "default" in custom_instructions_cache:
-            del custom_instructions_cache["default"]
-            print(f"🔄 [API] Cleared custom instructions from cache", file=sys.stderr)
-        else:
-            print(f"ℹ️ [API] No custom instructions in cache to clear", file=sys.stderr)
+    print(f"⚠️ [API] DEPRECATED: /api/instructions/reset called - custom cache is DISABLED", file=sys.stderr)
 
-        print(f"✅ [API] Reset to default instructions", file=sys.stderr)
-
-        return {
-            "success": True,
-            "message": "Reset to default instructions (from spec/instructions.txt)"
-        }
-    except Exception as e:
-        print(f"❌ [API] Failed to reset instructions: {e}", file=sys.stderr)
-        return {
-            "success": False,
-            "error": str(e)
-        }
+    return {
+        "success": False,
+        "error": "This endpoint is deprecated. The custom instructions cache has been disabled. Backend always uses instructions.txt unless a database prompt is provided via custom_instructions parameter."
+    }
 
 
 @app.post("/api/multi-agent/stream")

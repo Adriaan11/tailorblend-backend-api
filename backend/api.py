@@ -19,9 +19,10 @@ import sys
 import json
 import mimetypes
 import logging
+from datetime import datetime
 from typing import Optional, Dict, List
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Query, Form, Request, HTTPException
+from fastapi import FastAPI, Query, Form, Request, HTTPException, UploadFile
 from fastapi.responses import StreamingResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
@@ -139,6 +140,14 @@ try:
     logger.debug("✅ backend.models imported")
 except Exception as e:
     logger.error(f"❌ Failed to import backend.models: {e}", exc_info=True)
+    raise
+
+try:
+    logger.debug("→ Importing vector_store_registry")
+    from vector_store_registry import VectorStoreRegistry, VectorStoreMetadata
+    logger.debug("✅ vector_store_registry imported")
+except Exception as e:
+    logger.error(f"❌ Failed to import vector_store_registry: {e}", exc_info=True)
     raise
 
 logger.info("✅ All imports successful")
@@ -281,6 +290,7 @@ async def _heavy_init():
     Background task for heavy initialization that must NOT block startup.
 
     This includes:
+    - Vector store registry initialization
     - MultiAgentOrchestrator initialization
     - TracingProcessor registration
     - Any other expensive setup
@@ -291,6 +301,11 @@ async def _heavy_init():
 
     try:
         logger.info("🔄 [BACKGROUND] Starting heavy initialization...")
+
+        # Initialize vector store registry (loads from file or creates default)
+        logger.info("🔢 [BACKGROUND] Initializing vector store registry...")
+        await VectorStoreRegistry.initialize_on_startup()
+        logger.info("✅ [BACKGROUND] Vector store registry initialized")
 
         # Register trace processor globally
         logger.info("📊 [BACKGROUND] Registering trace processor...")
@@ -527,6 +542,7 @@ async def generate_chat_stream(
     practitioner_mode: bool = False,
     reasoning_effort: Optional[str] = "minimal",
     verbosity: Optional[str] = "medium",
+    vector_store_id: Optional[str] = None,
     request: Optional[Request] = None
 ):
     """
@@ -546,6 +562,22 @@ async def generate_chat_stream(
         str: SSE formatted messages ("data: {token}\n\n")
     """
     try:
+        # Get or set active vector store for this session
+        if vector_store_id is None:
+            # Try to get from session state
+            session_data = conversation_state.get(session_id, {})
+            vector_store_id = session_data.get("vector_store_id")
+
+        if vector_store_id is None:
+            # No vector store specified - get the first available (default)
+            stores = await VectorStoreRegistry.list_all()
+            if not stores:
+                raise ValueError("No vector stores available. Please upload a dataset first.")
+            vector_store_id = stores[0].vector_store_id
+            logger.info(f"📊 [CHAT] No vector store specified, using default: {vector_store_id}")
+        else:
+            logger.info(f"📊 [CHAT] Using vector store: {vector_store_id}")
+
         # Determine which instructions to use
         instructions_to_use = custom_instructions
 
@@ -571,6 +603,7 @@ async def generate_chat_stream(
                 verbosity=verbosity
             )
             agent = await create_tailorblend_consultant(
+                vector_store_id=vector_store_id,
                 custom_instructions=instructions_to_use,
                 model=model,
                 model_settings=model_settings
@@ -578,6 +611,7 @@ async def generate_chat_stream(
         else:
             # GPT-4.x models - no special settings needed
             agent = await create_tailorblend_consultant(
+                vector_store_id=vector_store_id,
                 custom_instructions=instructions_to_use,
                 model=model
             )
@@ -1309,6 +1343,223 @@ async def reset_session(session_id: str = Form(..., description="Session identif
         "success": True,
         "message": f"Session {session_id} reset successfully"
     }
+
+
+# ============================================================================
+# Vector Store Management Endpoints
+# ============================================================================
+
+@app.get("/api/vector-stores")
+async def list_vector_stores():
+    """
+    List all available vector stores.
+
+    Returns:
+        dict: List of vector stores with metadata
+    """
+    try:
+        stores = await VectorStoreRegistry.list_all()
+        return {
+            "stores": [
+                {
+                    "id": store.id,
+                    "vector_store_id": store.vector_store_id,
+                    "name": store.name,
+                    "source_file": store.source_file,
+                    "created_at": store.created_at.isoformat(),
+                    "item_count": store.item_count
+                }
+                for store in stores
+            ]
+        }
+    except Exception as e:
+        logger.error(f"❌ [VECTOR-STORES] Failed to list: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/vector-stores/upload")
+async def upload_vector_store(
+    file: UploadFile = None,
+    name: str = Query(..., description="Name for the dataset")
+):
+    """
+    Upload JSON file and create new vector store.
+
+    Args:
+        file: JSON file to upload
+        name: Display name for the dataset
+
+    Returns:
+        dict: Metadata for the created vector store
+    """
+    try:
+        if file is None:
+            raise HTTPException(status_code=400, detail="No file provided")
+
+        # Validate file size (max 10MB)
+        MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
+        content = await file.read()
+        if len(content) > MAX_FILE_SIZE:
+            raise HTTPException(
+                status_code=413,
+                detail=f"File too large. Maximum size is 10MB, received {len(content) / (1024*1024):.1f}MB"
+            )
+
+        json_content = content.decode('utf-8')
+
+        logger.info(f"📤 [UPLOAD] Processing file: {file.filename}")
+
+        # Create vector store
+        metadata = await VectorStoreRegistry.create_from_json(
+            json_content=json_content,
+            name=name,
+            source_filename=file.filename
+        )
+
+        logger.info(f"✅ [UPLOAD] Vector store created: {metadata.name}")
+
+        return {
+            "id": metadata.id,
+            "vector_store_id": metadata.vector_store_id,
+            "name": metadata.name,
+            "item_count": metadata.item_count
+        }
+
+    except ValueError as e:
+        logger.warning(f"⚠️  [UPLOAD] Validation error: {e}")
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"❌ [UPLOAD] Failed to upload: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/vector-stores/activate")
+async def activate_vector_store(
+    session_id: str = Query(..., description="Session ID"),
+    vector_store_id: str = Query(..., description="Vector store ID to activate")
+):
+    """
+    Set active vector store for a session.
+
+    Args:
+        session_id: Session identifier
+        vector_store_id: Vector store ID to activate
+
+    Returns:
+        dict: Activation confirmation
+    """
+    try:
+        # Verify store exists
+        store = await VectorStoreRegistry.get_by_id(vector_store_id)
+        if store is None:
+            raise ValueError(f"Vector store not found: {vector_store_id}")
+
+        # Update session state
+        if session_id not in conversation_state:
+            conversation_state[session_id] = {}
+
+        conversation_state[session_id]["vector_store_id"] = store.vector_store_id
+        conversation_state[session_id]["activated_at"] = datetime.utcnow().isoformat()
+
+        logger.info(f"✅ [ACTIVATE] Session {session_id} switched to {store.name}")
+
+        return {
+            "status": "activated",
+            "vector_store_id": store.vector_store_id,
+            "name": store.name
+        }
+
+    except ValueError as e:
+        logger.warning(f"⚠️  [ACTIVATE] Validation error: {e}")
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        logger.error(f"❌ [ACTIVATE] Failed to activate: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/api/vector-stores/active")
+async def get_active_vector_store(session_id: str = Query(..., description="Session ID")):
+    """
+    Get currently active vector store for a session.
+
+    Args:
+        session_id: Session identifier
+
+    Returns:
+        dict: Active vector store metadata
+    """
+    try:
+        session_data = conversation_state.get(session_id, {})
+        vector_store_id = session_data.get("vector_store_id")
+
+        if not vector_store_id:
+            # Return default if no active store
+            stores = await VectorStoreRegistry.list_all()
+            if not stores:
+                raise HTTPException(
+                    status_code=503,
+                    detail="No vector stores available"
+                )
+            store = stores[0]
+        else:
+            # Find store by vector_store_id
+            stores = await VectorStoreRegistry.list_all()
+            store = next((s for s in stores if s.vector_store_id == vector_store_id), None)
+            if store is None:
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"Vector store not found: {vector_store_id}"
+                )
+
+        return {
+            "id": store.id,
+            "vector_store_id": store.vector_store_id,
+            "name": store.name,
+            "item_count": store.item_count
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"❌ [GET-ACTIVE] Failed: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.delete("/api/vector-stores/{store_id}")
+async def delete_vector_store(store_id: str):
+    """
+    Delete vector store from registry and OpenAI.
+
+    Args:
+        store_id: Registry ID to delete
+
+    Returns:
+        dict: Deletion confirmation
+    """
+    try:
+        # Get metadata first
+        store = await VectorStoreRegistry.get_by_id(store_id)
+        if store is None:
+            raise HTTPException(status_code=404, detail=f"Vector store not found: {store_id}")
+
+        store_name = store.name
+
+        # Delete from registry (also deletes from OpenAI)
+        await VectorStoreRegistry.delete(store_id)
+
+        logger.info(f"✅ [DELETE] Vector store deleted: {store_name}")
+
+        return {
+            "status": "deleted",
+            "id": store_id,
+            "name": store_name
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"❌ [DELETE] Failed to delete: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # ============================================================================

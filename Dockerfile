@@ -23,7 +23,7 @@ COPY backend/ ./backend/
 COPY tb_agents/ ./tb_agents/
 COPY config/ ./config/
 COPY spec/ ./spec/
-COPY instruction_parser.py token_counter.py ./
+COPY instruction_parser.py token_counter.py vector_store_registry.py ./
 
 # Create non-root user for security
 RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app

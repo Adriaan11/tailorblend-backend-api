@@ -1380,7 +1380,7 @@ async def list_vector_stores():
 @app.post("/api/vector-stores/upload")
 async def upload_vector_store(
     file: UploadFile = None,
-    name: str = Query(..., description="Name for the dataset")
+    name: str = Form(..., description="Name for the dataset")
 ):
     """
     Upload JSON file and create new vector store.

@@ -296,9 +296,11 @@ class VectorStoreRegistry:
 
         except ValueError:
             raise
+        except APIError:
+            raise  # Re-raise OpenAI API errors as-is
         except Exception as e:
             logger.error(f"❌ Failed to create vector store: {e}", exc_info=True)
-            raise APIError(f"Failed to create vector store: {e}")
+            raise RuntimeError(f"Failed to create vector store: {e}")
 
     @classmethod
     async def create_from_multiple_files(
@@ -384,11 +386,11 @@ class VectorStoreRegistry:
                 # Check for failures
                 if batch_response.file_counts.failed > 0:
                     logger.warning(f"  ⚠️  {batch_response.file_counts.failed} files failed to index")
-                    raise APIError(f"{batch_response.file_counts.failed} out of {batch_response.file_counts.total} files failed to index")
+                    raise RuntimeError(f"{batch_response.file_counts.failed} out of {batch_response.file_counts.total} files failed to index")
 
                 if batch_response.status != "completed":
                     logger.warning(f"  ⚠️  Batch processing not fully completed: {batch_response.status}")
-                    raise APIError(f"Batch upload did not complete successfully: {batch_response.status}")
+                    raise RuntimeError(f"Batch upload did not complete successfully: {batch_response.status}")
 
                 # Step 4: Update vector store name with actual item count
                 client.beta.vector_stores.update(
@@ -429,10 +431,10 @@ class VectorStoreRegistry:
         except ValueError:
             raise
         except APIError:
-            raise
+            raise  # Re-raise OpenAI API errors as-is
         except Exception as e:
             logger.error(f"❌ Failed to create vector store from multiple files: {e}", exc_info=True)
-            raise APIError(f"Failed to create vector store: {e}")
+            raise RuntimeError(f"Failed to create vector store: {e}")
 
     @classmethod
     def _json_to_markdown(cls, json_content: str) -> str:
@@ -511,9 +513,11 @@ class VectorStoreRegistry:
 
             logger.info(f"✅ Vector store deleted: {metadata.name}")
 
+        except APIError:
+            raise  # Re-raise OpenAI API errors as-is
         except Exception as e:
             logger.error(f"❌ Failed to delete vector store: {e}", exc_info=True)
-            raise APIError(f"Failed to delete vector store: {e}")
+            raise RuntimeError(f"Failed to delete vector store: {e}")
 
     @classmethod
     async def _save_to_file(cls) -> None:

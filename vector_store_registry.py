@@ -334,7 +334,7 @@ class VectorStoreRegistry:
             try:
                 # Step 1: Create empty vector store FIRST
                 logger.debug("  → Creating vector store...")
-                vs_response = client.beta.vector_stores.create(
+                vs_response = client.vector_stores.create(
                     name=f"{name}|multi"  # Temporary name, will update with item count
                 )
                 vector_store_id = vs_response.id
@@ -372,7 +372,7 @@ class VectorStoreRegistry:
                 # Step 3: Batch upload all files using upload_and_poll
                 logger.debug(f"  → Uploading {len(file_tuples)} files to vector store (batch)...")
 
-                batch_response = client.beta.vector_stores.file_batches.upload_and_poll(
+                batch_response = client.vector_stores.file_batches.upload_and_poll(
                     vector_store_id=vector_store_id,
                     files=file_tuples,
                     max_concurrency=5  # Upload up to 5 files concurrently
@@ -393,7 +393,7 @@ class VectorStoreRegistry:
                     raise RuntimeError(f"Batch upload did not complete successfully: {batch_response.status}")
 
                 # Step 4: Update vector store name with actual item count
-                client.beta.vector_stores.update(
+                client.vector_stores.update(
                     vector_store_id=vector_store_id,
                     name=f"{name}|{total_items}"
                 )
@@ -422,7 +422,7 @@ class VectorStoreRegistry:
                 if vector_store_id:
                     try:
                         logger.warning(f"  🧹 Cleaning up vector store {vector_store_id} due to error")
-                        client.beta.vector_stores.delete(vector_store_id)
+                        client.vector_stores.delete(vector_store_id)
                         logger.debug(f"  ✓ Vector store deleted")
                     except Exception as cleanup_error:
                         logger.error(f"  ⚠️  Failed to cleanup vector store: {cleanup_error}")

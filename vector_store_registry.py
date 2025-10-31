@@ -301,6 +301,140 @@ class VectorStoreRegistry:
             raise APIError(f"Failed to create vector store: {e}")
 
     @classmethod
+    async def create_from_multiple_files(
+        cls,
+        files: List,  # List[UploadFile] from FastAPI
+        name: str
+    ) -> VectorStoreMetadata:
+        """
+        Create new vector store from multiple user-provided files using batch upload.
+
+        This method uses OpenAI's file_batches.upload_and_poll() for efficient
+        concurrent upload and indexing of multiple files into a single vector store.
+
+        Args:
+            files: List of UploadFile objects (from FastAPI File upload)
+            name: Display name for the dataset
+
+        Returns:
+            VectorStoreMetadata for the created store
+
+        Raises:
+            ValueError: If any JSON is invalid
+            APIError: If OpenAI API fails
+        """
+        try:
+            logger.info(f"📤 Creating vector store from {len(files)} files: {name}")
+
+            client = OpenAI()
+            vector_store_id = None
+
+            try:
+                # Step 1: Create empty vector store FIRST
+                logger.debug("  → Creating vector store...")
+                vs_response = client.beta.vector_stores.create(
+                    name=f"{name}|multi"  # Temporary name, will update with item count
+                )
+                vector_store_id = vs_response.id
+                logger.debug(f"  ✓ Vector store created: {vector_store_id}")
+
+                # Step 2: Process and prepare all files
+                file_tuples = []  # List of (filename, content_bytes) tuples
+                total_items = 0
+                source_filenames = []
+
+                for upload_file in files:
+                    # Read content
+                    content = await upload_file.read()
+                    content_str = content.decode('utf-8')
+
+                    # Validate JSON
+                    try:
+                        data = json.loads(content_str)
+                        if isinstance(data, list):
+                            total_items += len(data)
+                        else:
+                            total_items += 1
+                        logger.debug(f"  ✓ {upload_file.filename}: {len(data) if isinstance(data, list) else 1} items")
+                    except json.JSONDecodeError as e:
+                        logger.error(f"  ✗ Invalid JSON in {upload_file.filename}: {e}")
+                        raise ValueError(f"Invalid JSON in {upload_file.filename}: {e}")
+
+                    # Convert to markdown for better semantic search
+                    markdown_content = cls._json_to_markdown(content_str)
+
+                    # Prepare tuple for batch upload
+                    file_tuples.append((upload_file.filename, markdown_content.encode("utf-8")))
+                    source_filenames.append(upload_file.filename)
+
+                # Step 3: Batch upload all files using upload_and_poll
+                logger.debug(f"  → Uploading {len(file_tuples)} files to vector store (batch)...")
+
+                batch_response = client.beta.vector_stores.file_batches.upload_and_poll(
+                    vector_store_id=vector_store_id,
+                    files=file_tuples,
+                    max_concurrency=5  # Upload up to 5 files concurrently
+                )
+
+                logger.debug(f"  ✓ Batch status: {batch_response.status}")
+                logger.debug(f"  ✓ File counts: completed={batch_response.file_counts.completed}, "
+                           f"failed={batch_response.file_counts.failed}, "
+                           f"total={batch_response.file_counts.total}")
+
+                # Check for failures
+                if batch_response.file_counts.failed > 0:
+                    logger.warning(f"  ⚠️  {batch_response.file_counts.failed} files failed to index")
+                    raise APIError(f"{batch_response.file_counts.failed} out of {batch_response.file_counts.total} files failed to index")
+
+                if batch_response.status != "completed":
+                    logger.warning(f"  ⚠️  Batch processing not fully completed: {batch_response.status}")
+                    raise APIError(f"Batch upload did not complete successfully: {batch_response.status}")
+
+                # Step 4: Update vector store name with actual item count
+                client.beta.vector_stores.update(
+                    vector_store_id=vector_store_id,
+                    name=f"{name}|{total_items}"
+                )
+                logger.debug(f"  ✓ Updated vector store name with item count: {total_items}")
+
+                # Step 5: Create metadata
+                metadata = VectorStoreMetadata(
+                    id=str(uuid.uuid4()),
+                    vector_store_id=vector_store_id,
+                    name=name,
+                    source_file=", ".join(source_filenames),  # Comma-separated list of filenames
+                    item_count=total_items
+                )
+
+                # Add to registry
+                cls._registry[metadata.id] = metadata
+
+                # Persist to file
+                await cls._save_to_file()
+
+                logger.info(f"✅ Vector store created: {name} ({len(files)} files, {total_items} items, {vector_store_id})")
+                return metadata
+
+            except (ValueError, APIError):
+                # Cleanup: delete vector store if creation failed
+                if vector_store_id:
+                    try:
+                        logger.warning(f"  🧹 Cleaning up vector store {vector_store_id} due to error")
+                        client.beta.vector_stores.delete(vector_store_id)
+                        logger.debug(f"  ✓ Vector store deleted")
+                    except Exception as cleanup_error:
+                        logger.error(f"  ⚠️  Failed to cleanup vector store: {cleanup_error}")
+                raise
+
+        except ValueError:
+            raise
+        except APIError:
+            raise
+        except Exception as e:
+            logger.error(f"❌ Failed to create vector store from multiple files: {e}", exc_info=True)
+            raise APIError(f"Failed to create vector store: {e}")
+
+    @classmethod
     def _json_to_markdown(cls, json_content: str) -> str:
         """
         Convert JSON to markdown for better semantic search.

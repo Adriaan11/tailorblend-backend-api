@@ -22,7 +22,7 @@ import logging
 from datetime import datetime
 from typing import Optional, Dict, List
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Query, Form, Request, HTTPException, UploadFile
+from fastapi import FastAPI, Query, Form, Request, HTTPException, UploadFile, File
 from fastapi.responses import StreamingResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
@@ -1379,51 +1379,112 @@ async def list_vector_stores():
 
 @app.post("/api/vector-stores/upload")
 async def upload_vector_store(
-    file: UploadFile = None,
+    files: List[UploadFile] = File(..., description="JSON files to upload"),
     name: str = Form(..., description="Name for the dataset")
 ):
     """
-    Upload JSON file and create new vector store.
+    Upload one or more JSON files and create a single vector store.
+
+    Supports both single-file and multi-file uploads:
+    - Single file: Uses existing create_from_json() method (backward compatible)
+    - Multiple files: Uses create_from_multiple_files() with batch upload
 
     Args:
-        file: JSON file to upload
+        files: List of JSON file(s) to upload (1-20 files)
         name: Display name for the dataset
 
     Returns:
-        dict: Metadata for the created vector store
+        dict: Metadata for the created vector store including file_count
     """
     try:
-        if file is None:
-            raise HTTPException(status_code=400, detail="No file provided")
+        if not files or len(files) == 0:
+            raise HTTPException(status_code=400, detail="No files provided")
 
-        # Validate file size (max 10MB)
-        MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
-        content = await file.read()
-        if len(content) > MAX_FILE_SIZE:
+        # Validate file count (max 20 files)
+        MAX_FILES = 20
+        if len(files) > MAX_FILES:
             raise HTTPException(
-                status_code=413,
-                detail=f"File too large. Maximum size is 10MB, received {len(content) / (1024*1024):.1f}MB"
+                status_code=400,
+                detail=f"Too many files. Maximum is {MAX_FILES}, received {len(files)}"
             )
 
-        json_content = content.decode('utf-8')
+        logger.info(f"📤 [UPLOAD] Received {len(files)} file(s) for dataset '{name}'")
 
-        logger.info(f"📤 [UPLOAD] Processing file: {file.filename}")
+        # Validate all files are JSON and check total size
+        MAX_TOTAL_SIZE = 50 * 1024 * 1024  # 50MB total
+        MAX_SINGLE_FILE_SIZE = 10 * 1024 * 1024  # 10MB per file
+        total_size = 0
 
-        # Create vector store
-        metadata = await VectorStoreRegistry.create_from_json(
-            json_content=json_content,
-            name=name,
-            source_filename=file.filename
-        )
+        for file in files:
+            if not file.filename.endswith('.json'):
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"File '{file.filename}' is not a JSON file. All files must have .json extension"
+                )
 
-        logger.info(f"✅ [UPLOAD] Vector store created: {metadata.name}")
+            # Check individual file size (peek at content length)
+            content = await file.read()
+            file_size = len(content)
+            total_size += file_size
 
-        return {
-            "id": metadata.id,
-            "vector_store_id": metadata.vector_store_id,
-            "name": metadata.name,
-            "item_count": metadata.item_count
-        }
+            if file_size > MAX_SINGLE_FILE_SIZE:
+                raise HTTPException(
+                    status_code=413,
+                    detail=f"File '{file.filename}' is too large. Maximum size is 10MB per file, received {file_size / (1024*1024):.1f}MB"
+                )
+
+            # Reset file position for later reading
+            await file.seek(0)
+
+        if total_size > MAX_TOTAL_SIZE:
+            raise HTTPException(
+                status_code=413,
+                detail=f"Total file size too large. Maximum is 50MB, received {total_size / (1024*1024):.1f}MB"
+            )
+
+        # Branch based on number of files
+        if len(files) == 1:
+            # Single file: use existing method for backward compatibility
+            file = files[0]
+            content = await file.read()
+            json_content = content.decode('utf-8')
+
+            logger.info(f"📤 [UPLOAD] Processing single file: {file.filename}")
+
+            metadata = await VectorStoreRegistry.create_from_json(
+                json_content=json_content,
+                name=name,
+                source_filename=file.filename
+            )
+
+            logger.info(f"✅ [UPLOAD] Vector store created: {metadata.name}")
+
+            return {
+                "id": metadata.id,
+                "vector_store_id": metadata.vector_store_id,
+                "name": metadata.name,
+                "item_count": metadata.item_count,
+                "file_count": 1
+            }
+
+        else:
+            # Multiple files: use batch upload
+            logger.info(f"📤 [UPLOAD] Processing {len(files)} files with batch upload")
+
+            metadata = await VectorStoreRegistry.create_from_multiple_files(
+                files=files,
+                name=name
+            )
+
+            logger.info(f"✅ [UPLOAD] Vector store created: {metadata.name} ({len(files)} files)")
+
+            return {
+                "id": metadata.id,
+                "vector_store_id": metadata.vector_store_id,
+                "name": metadata.name,
+                "item_count": metadata.item_count,
+                "file_count": len(files)
+            }
 
     except ValueError as e:
         logger.warning(f"⚠️  [UPLOAD] Validation error: {e}")
